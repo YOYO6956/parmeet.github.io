@@ -16,19 +16,19 @@
         }
 
         body {
-            background-color: #0b0914; /* Dark background */
+            background-color: #050505; /* Pitch black for maximum glow */
             color: #ffffff;
-            overflow-x: hidden;
+            overflow: hidden; /* Stop scrolling to keep the 3D illusion perfect */
         }
 
-        /* 3D Particle Background Container */
-        #particles-js {
+        /* True 3D Canvas Background */
+        #bg-canvas {
             position: fixed;
-            width: 100vw;
-            height: 100vh;
             top: 0;
             left: 0;
-            z-index: -1; /* Puts it behind the content */
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
         }
 
         /* Main Content Wrapper */
@@ -38,33 +38,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 50px 20px;
-            min-height: 100vh;
+            justify-content: center;
+            height: 100vh;
+            pointer-events: none; /* Lets mouse pass through to the 3D background */
         }
 
-        /* Glowing Animated Title */
-        h1 {
-            font-size: 4rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8b, #ff007f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: float 3s ease-in-out infinite;
-            text-shadow: 0px 10px 30px rgba(255, 0, 127, 0.4);
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #cccccc;
-            margin-bottom: 50px;
-            letter-spacing: 2px;
-        }
-
-        /* 3D Glass Cards */
+        /* Allow clicking inside the cards */
         .card-container {
+            pointer-events: auto; 
             display: flex;
             gap: 40px;
             flex-wrap: wrap;
@@ -73,36 +54,59 @@
             max-width: 1000px;
         }
 
+        /* Glowing Animated Title */
+        h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #ff007f, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s infinite alternate;
+            text-shadow: 0px 0px 40px rgba(255, 0, 127, 0.6);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #f0f0f0;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+            text-shadow: 0px 0px 10px rgba(255,255,255,0.5);
+        }
+
+        /* 3D Glass Cards */
         .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px); /* Glass effect */
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(20, 10, 20, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 0, 127, 0.2);
             border-radius: 20px;
             padding: 40px;
             width: 400px;
-            transition: all 0.4s ease;
-            cursor: default;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
         }
 
-        /* Insane 3D Hover Effect */
+        /* Even crazier 3D Hover Effect on Cards */
         .card:hover {
-            transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateZ(20px) translateY(-10px);
-            box-shadow: -20px 20px 50px rgba(0, 0, 0, 0.5), 
-                        0px 0px 20px rgba(255, 0, 127, 0.3);
-            border: 1px solid rgba(255, 107, 107, 0.5);
+            transform: perspective(1000px) rotateX(8deg) rotateY(-8deg) translateZ(30px) translateY(-15px);
+            box-shadow: -20px 20px 60px rgba(0, 0, 0, 0.8), 
+                        0px 0px 30px rgba(255, 0, 127, 0.5);
+            border: 1px solid rgba(255, 107, 107, 0.8);
         }
 
         .card h2 {
             color: #ff6b6b;
             margin-bottom: 20px;
             font-size: 1.8rem;
-            border-bottom: 2px solid #ff6b6b;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.3);
             padding-bottom: 10px;
         }
 
         /* Server IP Copy Box */
         .ip-box {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             padding: 15px;
             border-radius: 10px;
             text-align: center;
@@ -110,135 +114,188 @@
             letter-spacing: 1px;
             margin-bottom: 20px;
             border: 1px dashed #ff007f;
+            color: #fff;
         }
 
         .btn {
             background: linear-gradient(45deg, #ff007f, #ff6b6b);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 15px 25px;
             font-size: 1.1rem;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
             transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0px 0px 15px rgba(255, 107, 107, 0.8);
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0px 10px 20px rgba(255, 0, 127, 0.6);
         }
 
         /* Rules List */
-        ul {
-            list-style: none;
-        }
-
+        ul { list-style: none; }
         ul li {
             margin-bottom: 15px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             position: relative;
-            padding-left: 25px;
+            padding-left: 30px;
+            color: #ddd;
         }
-
         ul li::before {
-            content: "⚔️";
+            content: "✦";
+            color: #ff007f;
             position: absolute;
             left: 0;
             top: 0;
+            font-size: 1.2rem;
         }
 
-        /* Floating Animation for Title */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
+        @keyframes pulse {
+            0% { transform: scale(1); text-shadow: 0px 0px 30px rgba(255, 0, 127, 0.4); }
+            100% { transform: scale(1.02); text-shadow: 0px 0px 60px rgba(255, 0, 127, 0.8); }
         }
-
     </style>
 </head>
 <body>
 
-    <div id="particles-js"></div>
+    <div id="bg-canvas"></div>
 
     <div class="container">
         <h1>SugarPie</h1>
         <div class="subtitle">The Sweetest Survival Network</div>
 
         <div class="card-container">
-            
             <div class="card">
                 <h2>How to Join</h2>
-                <p style="margin-bottom: 15px; color: #ddd;">Load up Minecraft (Java or Bedrock) and connect using the IP below!</p>
+                <p style="margin-bottom: 15px; color: #ccc;">Boot up Minecraft and paste the IP below into your server list!</p>
                 <div class="ip-box" id="server-ip">
                     play.sugarpie.net
                 </div>
-                <button class="btn" onclick="copyIP()">Click to Copy IP</button>
+                <button class="btn" onclick="copyIP()">Copy IP Address</button>
             </div>
 
             <div class="card">
                 <h2>Server Rules</h2>
                 <ul>
-                    <li>No grieving or stealing from other players' bases.</li>
-                    <li>Be respectful in chat. No toxicity or harassment.</li>
-                    <li>No hacking, x-raying, or use of unfair clients.</li>
-                    <li>Keep the map clean (cut down whole trees!).</li>
-                    <li>Have fun and help out the community!</li>
+                    <li>No grieving or stealing from other players.</li>
+                    <li>Keep chat respectful. Good vibes only.</li>
+                    <li>No x-ray, hacking, or unfair advantages.</li>
+                    <li>Replant what you take (keep the world sweet!).</li>
+                    <li>Listen to the admin team and have fun!</li>
                 </ul>
             </div>
-
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r136/three.min.js"></script>
     <script>
-        // Insane 3D Interactive Particles Configuration
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 100, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": ["#ff6b6b", "#ff007f", "#ffffff"] },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.7, "random": true },
-                "size": { "value": 4, "random": true },
-                "line_linked": { 
-                    "enable": true, 
-                    "distance": 150, 
-                    "color": "#ff6b6b", 
-                    "opacity": 0.4, 
-                    "width": 1.5 
-                },
-                "move": { 
-                    "enable": true, 
-                    "speed": 3, 
-                    "direction": "none", 
-                    "random": true, 
-                    "out_mode": "out" 
-                }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": { "enable": true, "mode": "repulse" }, // Repulses dots when mouse gets near
-                    "onclick": { "enable": true, "mode": "push" },    // Adds dots on click
-                    "resize": true
-                },
-                "modes": {
-                    "repulse": { "distance": 100, "duration": 0.4 },
-                    "push": { "particles_nb": 4 }
-                }
-            },
-            "retina_detect": true
+        // Setup True 3D Scene
+        const scene = new THREE.Scene();
+        // Fog gives it that fade-out into the distance look
+        scene.fog = new THREE.FogExp2(0x050505, 0.001); 
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 2000);
+        camera.position.z = 1000;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('bg-canvas').appendChild(renderer.domElement);
+
+        // Create a circular glowing texture for the dots
+        function createDotTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const context = canvas.getContext('2d');
+            const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255,255,255,1)');
+            gradient.addColorStop(0.2, 'rgba(255,0,127,0.8)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, 64, 64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Generate the 3D Dots
+        const geometry = new THREE.BufferGeometry();
+        const particlesCount = 2000; // INSANE amount of dots
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            // Spread them out massively in 3D space (X, Y, Z coordinates)
+            posArray[i] = (Math.random() - 0.5) * 3000; 
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 15,
+            map: createDotTexture(),
+            transparent: true,
+            blending: THREE.AdditiveBlending, // Makes them glow when they overlap
+            depthWrite: false
         });
+
+        const particlesMesh = new THREE.Points(geometry, material);
+        scene.add(particlesMesh);
+
+        // Mouse Tracking for Parallax Camera Movement
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
+
+        // Resize Fix
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Slowly rotate the entire galaxy of dots
+            particlesMesh.rotation.y = elapsedTime * 0.05;
+            particlesMesh.rotation.x = elapsedTime * 0.02;
+
+            // Insane 3D Parallax: Move the camera based on mouse position
+            targetX = mouseX * 2;
+            targetY = mouseY * 2;
+            
+            camera.position.x += (targetX - camera.position.x) * 0.02;
+            camera.position.y += (-targetY - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
 
         // Copy IP Script
         function copyIP() {
-            const ip = document.getElementById("server-ip").innerText;
+            const ip = document.getElementById("server-ip").innerText.trim();
             navigator.clipboard.writeText(ip);
             const btn = document.querySelector(".btn");
-            btn.innerText = "IP Copied! ✅";
+            btn.innerText = "IP Copied! 🎮";
             setTimeout(() => {
-                btn.innerText = "Click to Copy IP";
+                btn.innerText = "Copy IP Address";
             }, 2000);
         }
     </script>
