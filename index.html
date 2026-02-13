@@ -10,7 +10,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
         body {
-            background-color: #020005; /* Deep space black */
+            background-color: #05010a; /* Deep dark purple/black */
             color: #fff;
             overflow-x: hidden;
             overflow-y: auto;
@@ -19,17 +19,16 @@
             align-items: center;
             min-height: 100vh;
             perspective: 1200px;
-            /* Disable text selection when clicking the background */
             user-select: none; 
         }
 
-        /* Warp Speed Background Canvas */
-        #warp-canvas {
+        /* Matrix Rain Canvas */
+        #matrix-canvas {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 0;
-            cursor: crosshair; /* Gamer crosshair cursor */
+            cursor: crosshair;
         }
 
         /* Floating Glass Container */
@@ -67,11 +66,15 @@
 
         /* Click Indicator Text */
         .hint-text {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.9rem;
+            color: rgba(255, 142, 139, 0.8);
+            font-size: 0.95rem;
             letter-spacing: 2px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             animation: pulseHint 2s infinite;
+            background: rgba(255, 0, 127, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 0, 127, 0.3);
         }
 
         /* 3D Interactive Cards Grid */
@@ -225,8 +228,8 @@
         }
 
         @keyframes pulseHint {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.5; box-shadow: 0 0 5px rgba(255,0,127,0); }
+            50% { opacity: 1; box-shadow: 0 0 15px rgba(255,0,127,0.5); }
         }
 
         /* Balloon CSS */
@@ -254,13 +257,13 @@
 </head>
 <body>
 
-    <canvas id="warp-canvas"></canvas>
+    <canvas id="matrix-canvas"></canvas>
 
     <div class="glass-wrapper">
         <h1>SugarPie</h1>
         <div class="subtitle">Next-Gen Survival Experience</div>
         
-        <div class="hint-text">[ CLICK AND HOLD BACKGROUND FOR WARP SPEED ]</div>
+        <div class="hint-text">CLICK BACKGROUND FOR SHOCKWAVE 💥</div>
 
         <div class="grid">
             <div class="card" id="mc-card">
@@ -296,100 +299,123 @@
     </div>
 
     <script>
-        // --- 1. Custom 3D Warp Speed Canvas Engine ---
-        const canvas = document.getElementById('warp-canvas');
+        // --- 1. Custom 3D Matrix "Sugar Rain" Engine ---
+        const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         
-        let width, height, stars = [];
-        const numStars = 800; // Amount of stars
-        let speed = 2;        // Normal floating speed
-        let warpSpeed = 30;   // Insane speed on click
-        let targetSpeed = speed;
-        let currentSpeed = speed;
+        let width, height;
+        let drops = [];
+        const numDrops = 200; // Amount of falling symbols
 
-        // SugarPie Theme Colors for Stars
-        const starColors = ['#ff007f', '#ff8e8b', '#ffffff', '#d1b3ff'];
+        // SugarPie Theme Characters (Swords, Hearts, Stars, Cubes, Diamonds)
+        const chars = ['♥', '✦', '⚔', '⛏', '🍬', '⬟', '❖', '❄'];
+        const colors = ['#ff007f', '#ff8e8b', '#ffffff', '#d1b3ff'];
 
         function initCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < numStars; i++) {
-                stars.push(new Star());
+            drops = [];
+            for (let i = 0; i < numDrops; i++) {
+                drops.push(new Drop());
             }
         }
 
-        class Star {
+        class Drop {
             constructor() {
-                this.reset();
+                this.reset(true);
             }
-            reset() {
-                this.x = (Math.random() - 0.5) * width * 2;
-                this.y = (Math.random() - 0.5) * height * 2;
-                this.z = Math.random() * width;
-                this.pz = this.z; // Previous Z (used to draw the stretching line)
-                this.color = starColors[Math.floor(Math.random() * starColors.length)];
+            reset(randomY = false) {
+                // z represents depth (0.1 is far back, 1.5 is right in your face)
+                this.z = Math.random() * 1.2 + 0.3; 
+                this.x = Math.random() * width;
+                this.y = randomY ? Math.random() * height : -50;
+                this.speed = (Math.random() * 3 + 2) * this.z; // Closer drops fall faster
+                this.size = 14 * this.z; // Closer drops are bigger
+                this.char = chars[Math.floor(Math.random() * chars.length)];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Physics velocity (modified by shockwave)
+                this.vx = 0;
+                this.vy = this.speed;
             }
             update() {
-                this.z -= currentSpeed;
-                if (this.z <= 0) {
-                    this.reset();
-                    this.pz = this.z; // Prevent giant lines snapping across screen
+                // Apply velocity
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Friction to slowly stop the shockwave horizontal movement
+                this.vx *= 0.95;
+                
+                // Return to normal falling speed smoothly after shockwave
+                this.vy += (this.speed - this.vy) * 0.05;
+
+                // Reset when it falls off screen
+                if (this.y > height + 50) {
+                    this.reset(false);
                 }
+                // Wrap around sides if blasted off screen
+                if (this.x > width + 50) this.x = -50;
+                if (this.x < -50) this.x = width + 50;
             }
             draw() {
-                let fov = width;
-                
-                // Calculate current 2D screen position
-                let sx = (this.x / this.z) * fov + width / 2;
-                let sy = (this.y / this.z) * fov + height / 2;
-                
-                // Calculate previous 2D screen position
-                let px = (this.x / this.pz) * fov + width / 2;
-                let py = (this.y / this.pz) * fov + height / 2;
-
-                this.pz = this.z;
-
-                ctx.beginPath();
-                ctx.moveTo(px, py);
-                ctx.lineTo(sx, sy);
-                
-                // Stars get thicker as they get closer to you
-                let thickness = (1 - this.z / width) * 3;
-                ctx.lineWidth = Math.max(thickness, 0.5);
-                ctx.strokeStyle = this.color;
-                ctx.stroke();
+                // Opacity is based on depth (z) to create the 3D illusion
+                ctx.globalAlpha = this.z / 1.5; 
+                ctx.font = `bold ${this.size}px Outfit`;
+                ctx.fillStyle = this.color;
+                // Add a glow effect to closer objects
+                if (this.z > 1) {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = this.color;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fillText(this.char, this.x, this.y);
+                ctx.globalAlpha = 1; // Reset
             }
         }
 
-        function animateWarp() {
-            // Smooth speed transition logic
-            currentSpeed += (targetSpeed - currentSpeed) * 0.05;
-
-            // Fading trail effect (0.3 leaves a tiny trail, 1 is totally sharp)
-            ctx.fillStyle = 'rgba(2, 0, 5, 0.3)';
+        function animateMatrix() {
+            // The magic trick: Fill background with slightly transparent black.
+            // This leaves a "trail" behind the falling symbols!
+            ctx.fillStyle = 'rgba(5, 1, 10, 0.25)';
             ctx.fillRect(0, 0, width, height);
             
-            for (let i = 0; i < stars.length; i++) {
-                stars[i].update();
-                stars[i].draw();
+            for (let i = 0; i < drops.length; i++) {
+                drops[i].update();
+                drops[i].draw();
             }
-            requestAnimationFrame(animateWarp);
+            requestAnimationFrame(animateMatrix);
         }
 
-        // --- Interaction Listeners for Warp Speed ---
-        window.addEventListener('mousedown', () => targetSpeed = warpSpeed);
-        window.addEventListener('mouseup', () => targetSpeed = speed);
-        window.addEventListener('touchstart', () => targetSpeed = warpSpeed);
-        window.addEventListener('touchend', () => targetSpeed = speed);
+        // --- The Shockwave Click Event ---
+        window.addEventListener('click', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const blastRadius = 300;
+            const forceMultiplier = 25;
+
+            drops.forEach(drop => {
+                const dx = drop.x - mouseX;
+                const dy = drop.y - mouseY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // If drop is near the click, BLAST it outwards
+                if (distance < blastRadius) {
+                    // Push strength depends on how close it is to the center
+                    const push = (blastRadius - distance) / blastRadius;
+                    drop.vx = (dx / distance) * push * forceMultiplier;
+                    drop.vy = (dy / distance) * push * forceMultiplier;
+                }
+            });
+        });
 
         window.addEventListener('resize', initCanvas);
 
         // Start Engine
         initCanvas();
-        animateWarp();
+        animateMatrix();
 
-        // --- 2. 3D Card Tracking (Kept from last version!) ---
+        // --- 2. 3D Card Tracking ---
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
             card.addEventListener('mousemove', (e) => {
@@ -419,14 +445,14 @@
         }
 
         // --- 4. The 2-Minute Balloon Drop ---
-        const colors = ['#ff007f', '#ff8e8b', '#ffffff', '#4752C4'];
+        const balloonColors = ['#ff007f', '#ff8e8b', '#ffffff', '#4752C4'];
 
         function releaseBalloons() {
             for(let i = 0; i < 20; i++) {
                 setTimeout(() => {
                     const balloon = document.createElement('div');
                     balloon.className = 'balloon';
-                    balloon.style.background = `radial-gradient(circle at 15px 15px, ${colors[Math.floor(Math.random() * colors.length)]}, #111)`;
+                    balloon.style.background = `radial-gradient(circle at 15px 15px, ${balloonColors[Math.floor(Math.random() * balloonColors.length)]}, #111)`;
                     balloon.style.left = Math.random() * 100 + 'vw';
                     const duration = Math.random() * 4 + 5; 
                     balloon.style.animationDuration = duration + 's';
