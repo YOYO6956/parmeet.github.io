@@ -3,315 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SugarPie Minecraft Server</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>SugarPie Network</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
         body {
-            background: linear-gradient(135deg, #1a0b1c, #0a0410);
+            background-color: #05020a;
             color: #fff;
-            font-family: 'Poppins', sans-serif;
-            height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* Prevents scrollbars */
             display: flex;
             justify-content: center;
             align-items: center;
-            perspective: 1500px; /* Crucial for 3D depth */
+            height: 100vh;
+            perspective: 1200px;
         }
 
-        /* 3D Spinning Background Cubes */
-        .cube-container {
+        /* Interactive Physics Background Canvas */
+        #interactive-canvas {
             position: absolute;
+            top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 0;
-            pointer-events: none;
         }
 
-        .cube {
-            position: absolute;
-            width: 60px; height: 60px;
-            transform-style: preserve-3d;
-            animation: spin 10s infinite linear;
-        }
-
-        .face {
-            position: absolute;
-            width: 60px; height: 60px;
-            background: rgba(255, 107, 107, 0.2);
-            border: 2px solid rgba(255, 0, 127, 0.5);
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
-        }
-
-        .front  { transform: translateZ(30px); }
-        .back   { transform: rotateY(180deg) translateZ(30px); }
-        .left   { transform: rotateY(-90deg) translateZ(30px); }
-        .right  { transform: rotateY(90deg) translateZ(30px); }
-        .top    { transform: rotateX(90deg) translateZ(30px); }
-        .bottom { transform: rotateX(-90deg) translateZ(30px); }
-
-        @keyframes spin {
-            0% { transform: rotateX(0) rotateY(0) rotateZ(0) translateY(0); }
-            50% { transform: rotateX(180deg) rotateY(180deg) rotateZ(90deg) translateY(-20px); }
-            100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg) translateY(0); }
-        }
-
-        /* The Main 3D Holographic Board */
-        .hologram-board {
+        /* Floating Glass Container */
+        .glass-wrapper {
             position: relative;
             z-index: 10;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255,255,255,0.3);
-            border-left: 1px solid rgba(255,255,255,0.3);
-            border-radius: 30px;
-            padding: 50px;
-            width: 900px;
-            max-width: 90%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 0 30px rgba(255, 0, 127, 0.2);
-            transition: transform 0.1s ease-out; /* Smooth 3D tracking */
-            transform-style: preserve-3d;
+            pointer-events: none; /* Let the mouse hit the background and cards only */
         }
 
-        /* SugarPie Title */
+        /* Main Glowing Title */
         h1 {
-            font-family: 'Fredoka One', cursive;
-            font-size: 5rem;
-            background: linear-gradient(to right, #ff6b6b, #ff007f, #ffb3c6);
+            font-size: 5.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff007f, #ff8e8b, #fff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            transform: translateZ(60px); /* Pops off the board */
-            text-shadow: 0px 10px 20px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-shadow: 0px 10px 30px rgba(255, 0, 127, 0.4);
+            animation: floatText 4s ease-in-out infinite;
         }
 
         .subtitle {
             font-size: 1.2rem;
-            color: #ffb3c6;
+            color: #d1b3ff;
+            letter-spacing: 3px;
             margin-bottom: 40px;
-            transform: translateZ(40px);
-            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        /* Content Sections */
-        .content-grid {
+        /* 3D Interactive Cards */
+        .grid {
             display: flex;
             gap: 30px;
-            width: 100%;
-            transform: translateZ(30px);
+            pointer-events: auto; /* Re-enable clicks for the cards */
         }
 
-        .panel {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255, 107, 107, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .panel h2 {
-            color: #fff;
-            margin-bottom: 15px;
-            font-family: 'Fredoka One', cursive;
-            letter-spacing: 1px;
-        }
-
-        .ip-box {
-            background: rgba(255, 0, 127, 0.1);
-            border: 2px dashed #ff007f;
-            padding: 15px;
-            border-radius: 10px;
+        .card {
+            background: rgba(20, 10, 30, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 380px;
             text-align: center;
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #ffb3c6;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* The Card Hover Glow Effect */
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.15) 10%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255, 0, 127, 0.5);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 40px rgba(255, 0, 127, 0.2);
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        /* Server IP Styling */
+        .ip-display {
+            background: rgba(0,0,0,0.6);
+            padding: 15px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 1.3rem;
+            color: #ff8e8b;
+            border: 1px dashed rgba(255, 142, 139, 0.5);
             margin-bottom: 20px;
         }
 
+        /* Buttons */
         .btn {
-            background: linear-gradient(45deg, #ff007f, #ff6b6b);
-            color: white;
-            border: none;
-            padding: 15px 0;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
+            display: inline-block;
             width: 100%;
+            padding: 16px 0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
             transition: 0.3s;
             text-transform: uppercase;
         }
 
-        .btn:hover {
-            box-shadow: 0px 0px 25px rgba(255, 0, 127, 0.8);
-            transform: translateY(-2px);
+        .btn-mc {
+            background: linear-gradient(90deg, #ff007f, #ff6b6b);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(255, 0, 127, 0.3);
         }
 
-        ul { list-style: none; }
-        ul li { margin-bottom: 12px; padding-left: 25px; position: relative; color: #ddd; }
-        ul li::before { content: "🍭"; position: absolute; left: 0; top: 0; font-size: 1.1rem; }
+        .btn-mc:hover {
+            box-shadow: 0 15px 30px rgba(255, 0, 127, 0.6);
+            transform: translateY(-3px);
+        }
 
-        /* 3D Balloon Styling */
+        .btn-discord {
+            background: #5865F2; /* Official Discord Color */
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(88, 101, 242, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-discord:hover {
+            background: #4752C4;
+            box-shadow: 0 15px 30px rgba(88, 101, 242, 0.6);
+            transform: translateY(-3px);
+        }
+
+        @keyframes floatText {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Balloon CSS */
         .balloon {
             position: fixed;
             bottom: -150px;
-            width: 60px;
-            height: 75px;
+            width: 50px; height: 65px;
             border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.4);
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3);
             z-index: 999;
+            pointer-events: none;
             animation: floatUp ease-in forwards;
         }
-
-        /* The knot at the bottom of the balloon */
-        .balloon::after {
-            content: '';
-            position: absolute;
-            bottom: -8px; left: 50%;
-            transform: translateX(-50%);
-            width: 0; height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-bottom: 12px solid inherit; /* Inherits balloon color */
-        }
-
-        /* The string */
         .balloon::before {
-            content: '';
-            position: absolute;
-            bottom: -50px; left: 50%;
-            width: 1px; height: 50px;
-            background: rgba(255,255,255,0.4);
+            content: ''; position: absolute;
+            bottom: -40px; left: 50%;
+            width: 1px; height: 40px; background: rgba(255,255,255,0.3);
         }
 
         @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-            50% { transform: translateY(-60vh) rotate(15deg) scale(1.1); }
-            100% { transform: translateY(-120vh) rotate(-15deg) scale(1); opacity: 0; }
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
         }
-
     </style>
 </head>
 <body>
 
-    <div class="cube-container">
-        </div>
+    <canvas id="interactive-canvas"></canvas>
 
-    <div class="hologram-board" id="board">
+    <div class="glass-wrapper">
         <h1>SugarPie</h1>
-        <div class="subtitle">A New Dimension of Survival</div>
+        <div class="subtitle">Next-Gen Survival Experience</div>
 
-        <div class="content-grid">
-            <div class="panel">
-                <h2>Join The Server</h2>
-                <p style="margin-bottom: 15px; color: #aaa;">Ready for a sweet adventure? Copy the IP below to join.</p>
-                <div class="ip-box" id="server-ip">play.sugarpie.net</div>
-                <button class="btn" onclick="copyIP()">Copy IP Address</button>
+        <div class="grid">
+            <div class="card" id="mc-card">
+                <h2>Join Server</h2>
+                <div class="ip-display" id="server-ip">play.sugarpie.net</div>
+                <button class="btn btn-mc" onclick="copyIP()">Copy IP Address</button>
             </div>
 
-            <div class="panel">
-                <h2>Server Rules</h2>
-                <ul>
-                    <li>No grieving or stealing from bases.</li>
-                    <li>Keep the chat sweet and respectful.</li>
-                    <li>No hacking or unfair advantages.</li>
-                    <li>Replant crops and trees!</li>
-                    <li>Have fun and make friends!</li>
-                </ul>
+            <div class="card" id="discord-card">
+                <h2>Community</h2>
+                <p style="color: #aaa; margin-bottom: 25px; line-height: 1.5;">
+                    Join our massive community! Click below to instantly launch the Discord App.
+                </p>
+                <a href="https://discord.gg/YOUR_CODE_HERE" target="_blank" class="btn btn-discord">
+                    Launch Discord
+                </a>
             </div>
         </div>
     </div>
 
     <script>
-        /* --- 1. 3D Hover Tilt Effect --- */
-        const board = document.getElementById('board');
+        // --- 1. Custom Interactive Physics Background ---
+        const canvas = document.getElementById('interactive-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
         
-        document.addEventListener('mousemove', (e) => {
-            let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            board.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-        });
-
-        // Snap back to center when mouse leaves
-        document.addEventListener('mouseleave', () => {
-            board.style.transform = `rotateY(0deg) rotateX(0deg)`;
-        });
-
-        /* --- 2. Copy IP Function --- */
-        function copyIP() {
-            const ip = document.getElementById("server-ip").innerText;
-            navigator.clipboard.writeText(ip);
-            const btn = document.querySelector(".btn");
-            btn.innerText = "COPIED! 🎉";
-            setTimeout(() => btn.innerText = "Copy IP Address", 2000);
+        // Track Mouse Position
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 150 // How far the mouse pushes the dots away
         }
 
-        /* --- 3. Generative Background Cubes --- */
-        const cubeContainer = document.querySelector('.cube-container');
-        for(let i = 0; i < 8; i++) {
-            let cube = document.createElement('div');
-            cube.className = 'cube';
-            cube.style.top = Math.random() * 100 + 'vh';
-            cube.style.left = Math.random() * 100 + 'vw';
-            cube.style.animationDuration = (Math.random() * 10 + 10) + 's';
-            
-            // Add faces to cube
-            ['front', 'back', 'left', 'right', 'top', 'bottom'].forEach(faceClass => {
-                let face = document.createElement('div');
-                face.className = `face ${faceClass}`;
-                cube.appendChild(face);
-            });
-            cubeContainer.appendChild(cube);
-        }
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
 
-        /* --- 4. Insane 3D Balloon Generator --- */
-        const balloonColors = [
-            'radial-gradient(circle at 15px 15px, #ffb3c6, #ff007f)', // Pink
-            'radial-gradient(circle at 15px 15px, #cda434, #ff8c00)', // Orange/Gold
-            'radial-gradient(circle at 15px 15px, #b3e6ff, #007fff)', // Blue
-            'radial-gradient(circle at 15px 15px, #e6b3ff, #8a2be2)'  // Purple
-        ];
+        // Reset mouse when it leaves screen
+        window.addEventListener('mouseout', function() {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
 
-        function releaseBalloons() {
-            const amount = 25; // How many balloons per wave
-            
-            for(let i = 0; i < amount; i++) {
-                setTimeout(() => {
-                    const balloon = document.createElement('div');
-                    balloon.className = 'balloon';
-                    
-                    // Randomize position, color, and speed
-                    const randomColor = balloonColors[Math.floor(Math.random() * balloonColors.length)];
-                    balloon.style.background = randomColor;
-                    
-                    // Hack to make the knot match the balloon color (pulls the darkest color from the gradient roughly)
-                    balloon.style.borderBottomColor = randomColor.split(',')[2].replace(')', ''); 
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            // Draw individual dot
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            // Check mouse position, calculate physics, move dot
+            update() {
+                // Keep particles inside canvas
+                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
 
-                    balloon.style.left = Math.random() * 100 + 'vw';
-                    const duration = Math.random() * 4 + 6; // 6 to 10 seconds
-                    balloon.style.animationDuration = duration + 's';
-                    
-                    document.body.appendChild(balloon);
-
-                    // Destroy balloon element after it floats away to keep website fast
-                    setTimeout(() => {
-                        balloon.remove();
-                    }, duration * 1000);
-
-                }, i * 200); // Stagger the spawn times so they don't all clump together
+                // Collision detection - mouse position / particle position
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                
+                // If mouse is near, PUSH the particle away smoothly
+                if (distance < mouse.radius + this.size) {
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+                        this.x += 5;
+                    }
+                    if (mouse.x > this.x && this.x > this.size * 10) {
+                        this.x -= 5;
+                    }
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+                        this.y += 5;
+                    }
+                    if (mouse.y > this.y && this.y > this.size * 10) {
+                        this.y -= 5;
+                    }
+                }
+                
+                // Move the particle normally
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
             }
         }
 
-        // Trigger on load so you can see it immediately!
-        releaseBalloons();
+        function initCanvas() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 3) + 1;
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 2) - 1;
+                let directionY = (Math.random() * 2) - 1;
+                // Pink / Purple / Cyan SugarPie Colors
+                let colorArray = ['#ff007f', '#ff8e8b', '#d1b3ff', '#4752C4'];
+                let color = colorArray[Math.floor(Math.random() * colorArray.length)];
+                
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
 
-        // The requested 2-minute interval (120,000 milliseconds)
+        function animateCanvas() {
+            requestAnimationFrame(animateCanvas);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connectParticles();
+        }
+
+        // Draw connecting lines if particles are close to each other
+        function connectParticles() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                    + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    
+                    if (distance < (canvas.width/7) * (canvas.height/7)) {
+                        opacityValue = 1 - (distance/10000);
+                        ctx.strokeStyle = 'rgba(255, 142, 139,' + opacityValue + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initCanvas();
+        });
+
+        initCanvas();
+        animateCanvas();
+
+        // --- 2. 3D Card Tracking ---
+        const cards = document.querySelectorAll('.card');
+        
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; // x position within the element.
+                const y = e.clientY - rect.top;  // y position within the element.
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -10; // Max tilt 10deg
+                const rotateY = ((x - centerX) / centerX) * 10;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            });
+        });
+
+        // --- 3. Copy IP Function ---
+        function copyIP() {
+            const ip = document.getElementById("server-ip").innerText;
+            navigator.clipboard.writeText(ip);
+            const btn = document.querySelector(".btn-mc");
+            btn.innerText = "IP COPIED! 🎮";
+            setTimeout(() => btn.innerText = "Copy IP Address", 2000);
+        }
+
+        // --- 4. The 2-Minute Balloon Drop ---
+        const colors = ['#ff007f', '#ff8e8b', '#d1b3ff', '#4752C4'];
+
+        function releaseBalloons() {
+            for(let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const balloon = document.createElement('div');
+                    balloon.className = 'balloon';
+                    balloon.style.background = `radial-gradient(circle at 15px 15px, ${colors[Math.floor(Math.random() * colors.length)]}, #111)`;
+                    balloon.style.left = Math.random() * 100 + 'vw';
+                    const duration = Math.random() * 4 + 5; // 5-9 seconds
+                    balloon.style.animationDuration = duration + 's';
+                    document.body.appendChild(balloon);
+                    setTimeout(() => balloon.remove(), duration * 1000);
+                }, i * 300);
+            }
+        }
+
+        // Fire instantly on load, then strictly every 2 mins (120,000ms)
+        releaseBalloons();
         setInterval(releaseBalloons, 120000);
 
     </script>
