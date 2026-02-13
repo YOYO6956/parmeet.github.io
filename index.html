@@ -12,20 +12,22 @@
         body {
             background-color: #05020a;
             color: #fff;
-            overflow: hidden; /* Prevents scrollbars */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto;   /* Allow scrolling if screen is too small */
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             perspective: 1200px;
         }
 
         /* Interactive Physics Background Canvas */
         #interactive-canvas {
-            position: absolute;
+            position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 0;
+            pointer-events: auto; /* Let mouse interact with canvas */
         }
 
         /* Floating Glass Container */
@@ -35,7 +37,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            pointer-events: none; /* Let the mouse hit the background and cards only */
+            padding: 50px 20px;
+            pointer-events: none; /* Let the mouse hit the background */
+            width: 100%;
+            max-width: 1300px;
         }
 
         /* Main Glowing Title */
@@ -54,15 +59,18 @@
             font-size: 1.2rem;
             color: #d1b3ff;
             letter-spacing: 3px;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
             text-transform: uppercase;
         }
 
-        /* 3D Interactive Cards */
+        /* 3D Interactive Cards Grid */
         .grid {
             display: flex;
             gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap; /* Allows cards to stack on smaller screens */
             pointer-events: auto; /* Re-enable clicks for the cards */
+            width: 100%;
         }
 
         .card {
@@ -77,6 +85,8 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         /* The Card Hover Glow Effect */
@@ -101,8 +111,10 @@
 
         .card h2 {
             font-size: 1.8rem;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             color: #fff;
+            border-bottom: 2px solid rgba(255, 0, 127, 0.3);
+            padding-bottom: 15px;
         }
 
         /* Server IP Styling */
@@ -114,7 +126,43 @@
             font-size: 1.3rem;
             color: #ff8e8b;
             border: 1px dashed rgba(255, 142, 139, 0.5);
-            margin-bottom: 20px;
+            margin-bottom: auto; /* Pushes button to bottom */
+            margin-top: 20px;
+        }
+
+        /* Stylish Rules List */
+        .rules-list {
+            text-align: left;
+            list-style: none;
+            margin-bottom: auto; /* Keeps card height balanced */
+        }
+
+        .rules-list li {
+            margin-bottom: 18px;
+            padding-left: 35px;
+            position: relative;
+            font-size: 1.1rem;
+            color: #d1b3ff;
+            transition: transform 0.3s ease, color 0.3s ease;
+            cursor: default;
+        }
+
+        .rules-list li:hover {
+            transform: translateX(10px); /* Slides right on hover */
+            color: #fff;
+        }
+
+        /* Glowing Neon Bullets */
+        .rules-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff007f;
+            box-shadow: 0 0 10px #ff007f, 0 0 20px #ff8e8b;
         }
 
         /* Buttons */
@@ -130,6 +178,7 @@
             text-decoration: none;
             transition: 0.3s;
             text-transform: uppercase;
+            margin-top: 25px;
         }
 
         .btn-mc {
@@ -198,16 +247,30 @@
         <div class="grid">
             <div class="card" id="mc-card">
                 <h2>Join Server</h2>
+                <p style="color: #aaa; line-height: 1.5;">
+                    Ready for a sweet adventure? Copy the IP below and paste it into your Minecraft client!
+                </p>
                 <div class="ip-display" id="server-ip">play.sugarpie.net</div>
                 <button class="btn btn-mc" onclick="copyIP()">Copy IP Address</button>
             </div>
 
+            <div class="card" id="rules-card">
+                <h2>Server Rules</h2>
+                <ul class="rules-list">
+                    <li>No hacking, x-raying, or unfair client mods.</li>
+                    <li>No griefing or stealing from other bases.</li>
+                    <li>Be respectful. Zero tolerance for toxicity.</li>
+                    <li>Replant crops and keep the world clean.</li>
+                    <li>Listen to admins and have fun!</li>
+                </ul>
+            </div>
+
             <div class="card" id="discord-card">
                 <h2>Community</h2>
-                <p style="color: #aaa; margin-bottom: 25px; line-height: 1.5;">
-                    Join our massive community! Click below to instantly launch the Discord App.
+                <p style="color: #aaa; line-height: 1.5;">
+                    Join our massive community! Click below to instantly launch the Discord App and get chatting.
                 </p>
-                <a href="https://discord.gg/YOUR_CODE_HERE" target="_blank" class="btn btn-discord">
+                <a href="https://discord.gg/YOUR_CODE_HERE" target="_blank" class="btn btn-discord" style="margin-top: auto;">
                     Launch Discord
                 </a>
             </div>
@@ -222,20 +285,13 @@
         canvas.height = window.innerHeight;
 
         let particlesArray = [];
-        
-        // Track Mouse Position
-        let mouse = {
-            x: null,
-            y: null,
-            radius: 150 // How far the mouse pushes the dots away
-        }
+        let mouse = { x: null, y: null, radius: 150 }
 
         window.addEventListener('mousemove', function(event) {
             mouse.x = event.x;
             mouse.y = event.y;
         });
 
-        // Reset mouse when it leaves screen
         window.addEventListener('mouseout', function() {
             mouse.x = undefined;
             mouse.y = undefined;
@@ -243,48 +299,31 @@
 
         class Particle {
             constructor(x, y, directionX, directionY, size, color) {
-                this.x = x;
-                this.y = y;
-                this.directionX = directionX;
-                this.directionY = directionY;
-                this.size = size;
-                this.color = color;
+                this.x = x; this.y = y;
+                this.directionX = directionX; this.directionY = directionY;
+                this.size = size; this.color = color;
             }
-            // Draw individual dot
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
                 ctx.fillStyle = this.color;
                 ctx.fill();
             }
-            // Check mouse position, calculate physics, move dot
             update() {
-                // Keep particles inside canvas
                 if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
                 if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
 
-                // Collision detection - mouse position / particle position
                 let dx = mouse.x - this.x;
                 let dy = mouse.y - this.y;
                 let distance = Math.sqrt(dx*dx + dy*dy);
                 
-                // If mouse is near, PUSH the particle away smoothly
                 if (distance < mouse.radius + this.size) {
-                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
-                        this.x += 5;
-                    }
-                    if (mouse.x > this.x && this.x > this.size * 10) {
-                        this.x -= 5;
-                    }
-                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
-                        this.y += 5;
-                    }
-                    if (mouse.y > this.y && this.y > this.size * 10) {
-                        this.y -= 5;
-                    }
+                    if (mouse.x < this.x && this.x < canvas.width - this.size * 10) this.x += 5;
+                    if (mouse.x > this.x && this.x > this.size * 10) this.x -= 5;
+                    if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 5;
+                    if (mouse.y > this.y && this.y > this.size * 10) this.y -= 5;
                 }
                 
-                // Move the particle normally
                 this.x += this.directionX;
                 this.y += this.directionY;
                 this.draw();
@@ -300,7 +339,6 @@
                 let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
                 let directionX = (Math.random() * 2) - 1;
                 let directionY = (Math.random() * 2) - 1;
-                // Pink / Purple / Cyan SugarPie Colors
                 let colorArray = ['#ff007f', '#ff8e8b', '#d1b3ff', '#4752C4'];
                 let color = colorArray[Math.floor(Math.random() * colorArray.length)];
                 
@@ -311,14 +349,10 @@
         function animateCanvas() {
             requestAnimationFrame(animateCanvas);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-            }
+            for (let i = 0; i < particlesArray.length; i++) particlesArray[i].update();
             connectParticles();
         }
 
-        // Draw connecting lines if particles are close to each other
         function connectParticles() {
             let opacityValue = 1;
             for (let a = 0; a < particlesArray.length; a++) {
@@ -350,17 +384,14 @@
 
         // --- 2. 3D Card Tracking ---
         const cards = document.querySelectorAll('.card');
-        
         cards.forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; // x position within the element.
-                const y = e.clientY - rect.top;  // y position within the element.
-                
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                
-                const rotateX = ((y - centerY) / centerY) * -10; // Max tilt 10deg
+                const rotateX = ((y - centerY) / centerY) * -10; 
                 const rotateY = ((x - centerX) / centerX) * 10;
                 
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
@@ -390,7 +421,7 @@
                     balloon.className = 'balloon';
                     balloon.style.background = `radial-gradient(circle at 15px 15px, ${colors[Math.floor(Math.random() * colors.length)]}, #111)`;
                     balloon.style.left = Math.random() * 100 + 'vw';
-                    const duration = Math.random() * 4 + 5; // 5-9 seconds
+                    const duration = Math.random() * 4 + 5; 
                     balloon.style.animationDuration = duration + 's';
                     document.body.appendChild(balloon);
                     setTimeout(() => balloon.remove(), duration * 1000);
