@@ -3,36 +3,147 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ICON NETWORK • Minecraft Server</title>
+  <title>SugarPie • Minecraft Server</title>
+  <meta name="description" content="SugarPie Minecraft Server — Join Discord, copy IP, and start playing." />
   <style>
     :root{
-      --bg:#0b1020; --card:#121a33; --text:#e8ecff; --muted:#aab2d5;
-      --accent:#6ee7ff; --accent2:#a78bfa;
+      --bg:#05070d;
+      --card:rgba(255,255,255,.06);
+      --stroke:rgba(255,255,255,.12);
+      --text:#f4f6ff;
+      --muted:rgba(244,246,255,.72);
+      --accent:#a78bfa;
+      --accent2:#6ee7ff;
     }
-    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
-    body{margin:0;background:radial-gradient(1000px 600px at 20% 0%, rgba(167,139,250,.25), transparent),
-                     radial-gradient(900px 500px at 80% 20%, rgba(110,231,255,.22), transparent),
-                     var(--bg); color:var(--text);}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1100px;margin:auto;padding:28px 18px}
-    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.4px}
-    .badge{padding:4px 10px;border:1px solid rgba(255,255,255,.12);border-radius:999px;color:var(--muted);font-size:12px}
-    .btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);cursor:pointer}
-    .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#071024;font-weight:800}
-    .hero{margin-top:28px;display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:stretch}
-    .card{background:rgba(18,26,51,.75);border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-    h1{margin:0;font-size:42px;line-height:1.05}
-    p{margin:10px 0 0;color:var(--muted);font-size:16px;line-height:1.6}
-    .grid{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-    .tile{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03)}
-    .tile b{display:block;margin-bottom:6px}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      overflow-x:hidden;
+    }
+
+    /* Canvas background */
+    #bg{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      z-index:-2;
+      display:block;
+    }
+    /* Soft vignette + glow */
+    .overlay{
+      position:fixed; inset:0;
+      z-index:-1;
+      background:
+        radial-gradient(900px 600px at 20% 10%, rgba(167,139,250,.18), transparent 60%),
+        radial-gradient(800px 500px at 80% 20%, rgba(110,231,255,.14), transparent 55%),
+        radial-gradient(1200px 900px at 50% 120%, rgba(255,255,255,.06), transparent 55%),
+        radial-gradient(1200px 900px at 50% 50%, transparent 35%, rgba(0,0,0,.55) 100%);
+      pointer-events:none;
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:26px 18px 50px}
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding:10px 2px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+      user-select:none;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      box-shadow:0 18px 60px rgba(110,231,255,.18);
+    }
+    .brand h3{margin:0;font-size:16px;letter-spacing:.4px}
+    .badge{
+      display:inline-block;margin-left:8px;
+      padding:4px 10px;border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);font-size:12px
+    }
+    .nav .links{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      padding:10px 14px;border-radius:14px;
+      cursor:pointer;
+      transition:transform .12s ease, background .12s ease, border-color .12s ease;
+      text-decoration:none;
+      display:inline-flex;align-items:center;gap:8px;
+      backdrop-filter: blur(8px);
+    }
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.18)}
+    .btn.primary{
+      border:0;
+      color:#08101e;
+      font-weight:800;
+      background:linear-gradient(135deg,var(--accent2),var(--accent));
+      box-shadow:0 18px 70px rgba(167,139,250,.18);
+    }
+
+    .hero{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    .card{
+      border:1px solid var(--stroke);
+      background:var(--card);
+      border-radius:22px;
+      padding:18px;
+      box-shadow: 0 24px 90px rgba(0,0,0,.5);
+      backdrop-filter: blur(10px);
+      transform-style:preserve-3d;
+    }
+    h1{
+      margin:0;
+      font-size:44px;
+      line-height:1.05;
+      letter-spacing:-.6px;
+    }
+    .grad{
+      background:linear-gradient(135deg,var(--accent2),var(--accent));
+      -webkit-background-clip:text;background-clip:text;
+      color:transparent;
+    }
+    p{margin:10px 0 0;color:var(--muted);line-height:1.65}
     .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-    .copybox{display:flex;gap:10px;align-items:center;justify-content:space-between}
-    code{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);padding:10px 12px;border-radius:12px;display:block;width:100%}
-    .small{font-size:13px;color:var(--muted);margin-top:10px}
-    .footer{margin:28px 0 10px;color:rgba(170,178,213,.8);font-size:13px;text-align:center}
+    code{
+      display:block;
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      color:rgba(244,246,255,.92);
+      font-size:14px;
+    }
+    .tile{
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+    }
+    .tile b{display:block;margin-bottom:6px}
+    .small{margin-top:10px;font-size:13px;color:rgba(244,246,255,.62)}
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(3,1fr);
+      gap:12px;
+    }
+    .footer{margin-top:26px;text-align:center;color:rgba(244,246,255,.55);font-size:13px}
+
+    /* little “3D” tilt hint */
+    .tilt{will-change: transform}
     @media (max-width:900px){
       .hero{grid-template-columns:1fr}
       h1{font-size:34px}
@@ -41,50 +152,56 @@
   </style>
 </head>
 <body>
+  <canvas id="bg"></canvas>
+  <div class="overlay"></div>
+
   <div class="wrap">
     <div class="nav">
-      <div class="logo">
-        <span style="width:36px;height:36px;border-radius:12px;display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));"></span>
+      <div class="brand">
+        <div class="logo"></div>
         <div>
-          ICON NETWORK <span class="badge">Minecraft Server</span>
+          <h3>SugarPie <span class="badge">Minecraft Server</span></h3>
+          <div class="small" style="margin:2px 0 0">Clean. Fast. Community-first.</div>
         </div>
       </div>
-      <div class="btns">
+
+      <div class="links">
         <a class="btn" href="#how">How to Join</a>
         <a class="btn" href="#rules">Rules</a>
-        <a class="btn primary" href="https://discord.gg/twegqBsNxx" target="_blank" rel="noreferrer">Join Discord</a>
+        <a class="btn primary" href="YOUR_DISCORD_INVITE_LINK" target="_blank" rel="noreferrer">Join Discord</a>
       </div>
     </div>
 
     <div class="hero">
-      <div class="card">
-        <h1>Play. Grind. Flex. <br/>Welcome to <span style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;">ICON NETWORK</span></h1>
-        <p>Premium gameplay, active staff, events, and a friendly community. Join today and start your journey.</p>
+      <div class="card tilt" id="card1">
+        <h1>Welcome to <span class="grad">SugarPie</span></h1>
+        <p>Premium gameplay, smooth performance, events, and an active Discord. Copy the IP and hop in.</p>
 
         <div class="row">
-          <button class="btn primary" onclick="copyText('play.iconnetwork.xyz')">Copy Server IP</button>
+          <button class="btn primary" id="copyBtn">Copy Server IP</button>
           <a class="btn" href="YOUR_STORE_LINK" target="_blank" rel="noreferrer">Store</a>
           <a class="btn" href="YOUR_VOTE_LINK" target="_blank" rel="noreferrer">Vote</a>
         </div>
 
-        <div class="small">Tip: Replace links + server IP in code. Works on mobile too.</div>
+        <div class="small">Tip: This background is interactive — move your mouse 😈</div>
       </div>
 
-      <div class="card">
+      <div class="card tilt" id="card2">
         <b style="font-size:16px">Server Info</b>
         <div style="height:10px"></div>
-        <div class="copybox">
-          <code id="ip">play.iconnetwork.xyz</code>
-        </div>
+
+        <code id="ip">play.sugarpie.xyz</code>
+
         <div style="height:10px"></div>
         <div class="tile">
           <b>Version</b>
-          <span class="small">Java: 1.20+ • Bedrock: Supported (Geyser)</span>
+          <div class="small" style="margin:0">Java: 1.20+ • Bedrock: Supported (Geyser)</div>
         </div>
+
         <div style="height:10px"></div>
         <div class="tile">
-          <b>Status</b>
-          <span class="small">Online / Maintenance (add later via API)</span>
+          <b>Support</b>
+          <div class="small" style="margin:0">Join Discord for help, reports, and updates.</div>
         </div>
       </div>
     </div>
@@ -92,42 +209,212 @@
     <div class="grid" id="how">
       <div class="tile">
         <b>How to Join (Java)</b>
-        <div class="small">Multiplayer → Add Server → paste IP → Join.</div>
+        <div class="small" style="margin:0">Multiplayer → Add Server → paste IP → Join.</div>
       </div>
       <div class="tile">
         <b>How to Join (Bedrock)</b>
-        <div class="small">Servers → Add Server → IP + Port → Join.</div>
+        <div class="small" style="margin:0">Servers → Add Server → IP + Port → Join.</div>
       </div>
-      <div class="tile">
-        <b>Discord</b>
-        <div class="small">Events, giveaways, support, staff contact.</div>
+      <div class="tile" id="rules">
+        <b>Rules (short)</b>
+        <div class="small" style="margin:0">No hacks • Be respectful • No scams • Staff decision final.</div>
       </div>
     </div>
 
-    <div class="card" style="margin-top:18px" id="rules">
-      <b style="font-size:16px">Rules</b>
-      <p style="margin-top:8px">
-        1) No hacking / x-ray • 2) Respect everyone • 3) No scams • 4) No spam • 5) Staff decision final.
-      </p>
-    </div>
-
-    <div class="footer">© <span id="y"></span> ICON NETWORK • Not affiliated with Mojang or Microsoft</div>
+    <div class="footer">© <span id="y"></span> SugarPie • Not affiliated with Mojang/Microsoft</div>
   </div>
 
   <script>
+    // ====== EDIT THESE 3 THINGS ======
+    const SERVER_IP = "play.sugarpie.xyz";     // <-- change to your server IP
+    const DISCORD_LINK = "YOUR_DISCORD_INVITE_LINK"; // <-- change link in HTML too
+    // =================================
+
+    // Update year
     document.getElementById("y").textContent = new Date().getFullYear();
-    async function copyText(text){
-      try{
-        await navigator.clipboard.writeText(text);
-        alert("Copied: " + text);
-      }catch(e){
+
+    // Update IP text
+    const ipEl = document.getElementById("ip");
+    ipEl.textContent = SERVER_IP;
+
+    // Copy button
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(SERVER_IP);
+        toast("Copied: " + SERVER_IP);
+      } catch {
         const t = document.createElement("textarea");
-        t.value = text; document.body.appendChild(t);
+        t.value = SERVER_IP; document.body.appendChild(t);
         t.select(); document.execCommand("copy");
         document.body.removeChild(t);
-        alert("Copied: " + text);
+        toast("Copied: " + SERVER_IP);
       }
+    });
+
+    // Tiny toast (no ugly alert)
+    let toastTimer;
+    function toast(msg){
+      clearTimeout(toastTimer);
+      let el = document.getElementById("toast");
+      if(!el){
+        el = document.createElement("div");
+        el.id = "toast";
+        el.style.position="fixed";
+        el.style.left="50%";
+        el.style.bottom="26px";
+        el.style.transform="translateX(-50%)";
+        el.style.padding="10px 14px";
+        el.style.borderRadius="14px";
+        el.style.border="1px solid rgba(255,255,255,.14)";
+        el.style.background="rgba(0,0,0,.55)";
+        el.style.backdropFilter="blur(10px)";
+        el.style.color="rgba(244,246,255,.92)";
+        el.style.fontFamily="inherit";
+        el.style.fontSize="14px";
+        el.style.zIndex="50";
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.style.opacity="1";
+      toastTimer=setTimeout(()=>{el.style.opacity="0";},1200);
     }
+
+    // ===== 3D tilt for cards (looks premium) =====
+    function addTilt(el){
+      const strength = 10; // deg
+      el.addEventListener("mousemove",(e)=>{
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = `rotateY(${px*strength}deg) rotateX(${(-py)*strength}deg) translateZ(0)`;
+      });
+      el.addEventListener("mouseleave",()=>{
+        el.style.transform = "rotateY(0deg) rotateX(0deg)";
+      });
+    }
+    addTilt(document.getElementById("card1"));
+    addTilt(document.getElementById("card2"));
+
+    // ===== Particle "4D" background (depth + time + mouse lift) =====
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d", { alpha: true });
+
+    let W, H, DPR;
+    function resize(){
+      DPR = Math.min(2, window.devicePixelRatio || 1);
+      W = canvas.width = Math.floor(innerWidth * DPR);
+      H = canvas.height = Math.floor(innerHeight * DPR);
+      canvas.style.width = innerWidth + "px";
+      canvas.style.height = innerHeight + "px";
+    }
+    window.addEventListener("resize", resize, {passive:true});
+    resize();
+
+    const mouse = { x: innerWidth/2, y: innerHeight/2, vx:0, vy:0, down:false };
+    window.addEventListener("mousemove",(e)=>{
+      mouse.vx = e.clientX - mouse.x;
+      mouse.vy = e.clientY - mouse.y;
+      mouse.x = e.clientX; mouse.y = e.clientY;
+    }, {passive:true});
+
+    // Touch support
+    window.addEventListener("touchmove",(e)=>{
+      const t = e.touches[0]; if(!t) return;
+      mouse.x = t.clientX; mouse.y = t.clientY;
+    }, {passive:true});
+
+    const rand = (a,b)=> a + Math.random()*(b-a);
+
+    const COUNT = 220; // dots
+    const dots = [];
+    for(let i=0;i<COUNT;i++){
+      dots.push({
+        x: rand(0, innerWidth),
+        y: rand(0, innerHeight),
+        z: rand(0.2, 1.0),     // depth (0.2 far, 1 near)
+        r: rand(0.6, 1.8),     // base radius
+        sx: rand(-0.12, 0.12), // slow drift (time dimension)
+        sy: rand(-0.10, 0.10),
+        phase: rand(0, Math.PI*2)
+      });
+    }
+
+    function step(t){
+      ctx.clearRect(0,0,W,H);
+
+      // subtle starfield “dust”
+      const mx = mouse.x * DPR, my = mouse.y * DPR;
+
+      // draw connections a bit near mouse (premium)
+      const connectDist = 130 * DPR;
+
+      for(let i=0;i<COUNT;i++){
+        const d = dots[i];
+
+        // drift + wrap
+        d.x += d.sx * (0.6 + d.z);
+        d.y += d.sy * (0.6 + d.z);
+
+        // time wobble (4D-ish feel)
+        const wob = Math.sin(t*0.0015 + d.phase) * (0.35 + 0.9*d.z);
+        d.x += wob * 0.05;
+        d.y += Math.cos(t*0.0012 + d.phase) * 0.03;
+
+        if(d.x < -30) d.x = innerWidth + 30;
+        if(d.x > innerWidth + 30) d.x = -30;
+        if(d.y < -30) d.y = innerHeight + 30;
+        if(d.y > innerHeight + 30) d.y = -30;
+
+        // mouse influence (lift / “bring up”)
+        const dx = d.x - mouse.x;
+        const dy = d.y - mouse.y;
+        const dist = Math.hypot(dx,dy);
+        const influence = Math.max(0, 1 - dist/220); // 0..1
+
+        // fake "raise" in depth near cursor
+        const zBoost = d.z + influence * 0.55; // makes dot look closer
+        const par = (zBoost - 0.2) * 18;       // parallax amount
+
+        const px = (d.x + (mouse.vx||0) * 0.02 * influence) * DPR;
+        const py = (d.y + (mouse.vy||0) * 0.02 * influence) * DPR;
+
+        // parallax shift toward/away from mouse
+        const sx = px + ( (px - mx) / (220*DPR) ) * par;
+        const sy = py + ( (py - my) / (220*DPR) ) * par;
+
+        const radius = (d.r + influence*2.2) * DPR * (0.75 + zBoost);
+        const alpha = 0.25 + 0.55 * (0.35 + zBoost*0.65) + influence*0.25;
+
+        // dot
+        ctx.beginPath();
+        ctx.arc(sx, sy, radius, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${Math.min(0.95, alpha)})`;
+        ctx.fill();
+
+        // draw lines to nearby dots (only when near mouse, looks sick)
+        if(influence > 0.08){
+          for(let j=i+1;j<i+18 && j<COUNT;j++){
+            const e = dots[j];
+            const ex = e.x * DPR;
+            const ey = e.y * DPR;
+            const dd = Math.hypot(ex - px, ey - py);
+            if(dd < connectDist){
+              const a = (1 - dd/connectDist) * 0.22 * influence;
+              ctx.strokeStyle = `rgba(255,255,255,${a})`;
+              ctx.lineWidth = 1 * DPR;
+              ctx.beginPath();
+              ctx.moveTo(sx, sy);
+              // slight curve
+              ctx.quadraticCurveTo((sx+ex)/2 + 8*DPR*influence, (sy+ey)/2 - 8*DPR*influence, ex, ey);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   </script>
 </body>
 </html>
