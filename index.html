@@ -1,451 +1,277 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SugarPie • Minecraft Server</title>
-  <meta name="description" content="SugarPie — cozy grind, clean PvP, weekly events, and a community that actually helps." />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SugarPie</title>
 
-  <style>
-    :root{
-      --bg:#06070c;
-      --text:#f6f7ff;
-      --muted:rgba(246,247,255,.72);
-      --card:rgba(255,255,255,.06);
-      --stroke:rgba(255,255,255,.12);
-      --a:#6ee7ff;
-      --b:#a78bfa;
-      --c:#ff9bd5;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      overflow-x:hidden;
-    }
+<style>
 
-    /* Background layers */
-    #bg{position:fixed; inset:0; width:100%; height:100%; z-index:-2; display:block;}
-    .overlay{
-      position:fixed; inset:0; z-index:-1; pointer-events:none;
-      background:
-        radial-gradient(900px 600px at 15% 10%, rgba(255,155,213,.12), transparent 60%),
-        radial-gradient(900px 600px at 85% 15%, rgba(110,231,255,.14), transparent 60%),
-        radial-gradient(900px 600px at 55% 110%, rgba(167,139,250,.12), transparent 60%),
-        radial-gradient(1200px 900px at 50% 50%, transparent 35%, rgba(0,0,0,.58) 100%);
-    }
+/* ===== GLOBAL ===== */
+html{scroll-behavior:smooth;}
+body{
+margin:0;
+background:#05060a;
+color:white;
+font-family:system-ui;
+overflow-x:hidden;
+}
 
-    .wrap{max-width:1100px;margin:0 auto;padding:26px 18px 60px}
-    .top{
-      display:flex;align-items:center;justify-content:space-between;gap:14px;
-      padding:10px 2px;
-    }
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{
-      width:42px;height:42px;border-radius:16px;
-      background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-      box-shadow:0 22px 70px rgba(255,155,213,.12);
-    }
-    .title{margin:0;font-size:16px;letter-spacing:.3px;font-weight:900}
-    .tag{color:var(--muted);font-size:13px;margin-top:2px}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:6px 10px;border-radius:999px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.03);
-      color:rgba(246,247,255,.82);
-      font-size:12px;
-    }
+canvas{
+position:fixed;
+top:0;left:0;
+z-index:-1;
+}
 
-    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      padding:10px 14px;border-radius:14px;
-      cursor:pointer;text-decoration:none;
-      display:inline-flex;align-items:center;gap:9px;
-      transition:transform .12s ease, background .12s ease, border-color .12s ease;
-      backdrop-filter: blur(10px);
-      user-select:none;
-    }
-    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.18)}
-    .btn.primary{
-      border:0;color:#0a0d16;font-weight:950;
-      background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-      box-shadow:0 24px 90px rgba(110,231,255,.10);
-    }
+/* ===== NAVBAR ===== */
+.nav{
+position:sticky;
+top:10px;
+margin:20px auto;
+max-width:1100px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 18px;
+border-radius:18px;
+background:rgba(0,0,0,.4);
+border:1px solid rgba(255,255,255,.1);
+backdrop-filter:blur(15px);
+box-shadow:0 30px 100px rgba(0,0,0,.6);
+}
 
-    .hero{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:14px;
-      align-items:stretch;
-    }
-    .card{
-      border:1px solid var(--stroke);
-      background:var(--card);
-      border-radius:22px;
-      padding:18px;
-      box-shadow:0 28px 100px rgba(0,0,0,.55);
-      backdrop-filter: blur(12px);
-    }
-    .h1{margin:0;font-size:44px;line-height:1.02;letter-spacing:-.8px}
-    .grad{
-      background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-      -webkit-background-clip:text;background-clip:text;color:transparent;
-    }
-    .p{margin:10px 0 0;color:var(--muted);line-height:1.65}
-    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.brand{
+font-size:20px;
+font-weight:800;
+background:linear-gradient(90deg,#7dd3fc,#c084fc);
+-webkit-background-clip:text;
+color:transparent;
+}
 
-    .ipbox{
-      display:flex;gap:10px;align-items:center;margin-top:10px;
-      padding:12px;border-radius:16px;border:1px solid var(--stroke);
-      background:rgba(0,0,0,.18);
-    }
-    .ip{
-      flex:1;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size:14px;color:rgba(246,247,255,.92);
-      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-    }
-    .mini{
-      padding:8px 10px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.04);
-      color:rgba(246,247,255,.92);
-      cursor:pointer;
-    }
+/* ===== NEW TAB THEME ===== */
+.tabs{display:flex;gap:10px}
 
-    .grid{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-    }
-    .tile{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.03);
-      border-radius:18px;
-      padding:14px;
-    }
-    .tile b{display:block;margin-bottom:6px}
-    .small{color:rgba(246,247,255,.62);font-size:13px;line-height:1.55}
+.tab{
+padding:10px 16px;
+border-radius:12px;
+text-decoration:none;
+color:#d9e0ff;
+font-weight:600;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.12);
+position:relative;
+overflow:hidden;
+transition:.3s;
+}
 
-    .sectionTitle{
-      margin:18px 0 0;
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-    }
-    .sectionTitle h2{margin:0;font-size:16px;letter-spacing:.2px}
-    .hr{height:1px;background:rgba(255,255,255,.10);margin:12px 0 0;border-radius:999px}
+.tab:hover{
+transform:translateY(-2px);
+background:linear-gradient(135deg,#7dd3fc,#c084fc);
+color:black;
+box-shadow:0 15px 50px rgba(124,58,237,.4);
+}
 
-    .footer{margin-top:26px;text-align:center;color:rgba(246,247,255,.55);font-size:13px}
+/* ===== LAYOUT ===== */
+.wrap{max-width:1100px;margin:auto;padding:20px}
 
-    @media (max-width:900px){
-      .hero{grid-template-columns:1fr}
-      .h1{font-size:34px}
-      .grid{grid-template-columns:1fr}
-    }
-  </style>
+.card{
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.1);
+border-radius:20px;
+padding:20px;
+margin-top:20px;
+backdrop-filter:blur(12px);
+transition:.35s ease;
+}
+
+.card:hover{
+transform:translateY(-6px);
+box-shadow:0 40px 120px rgba(0,0,0,.7);
+}
+
+/* ===== HERO ===== */
+h1{font-size:46px;margin:0}
+.grad{
+background:linear-gradient(135deg,#7dd3fc,#c084fc);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+p{opacity:.8}
+
+/* ===== BUTTON ===== */
+.btn{
+padding:12px 18px;
+border-radius:12px;
+border:0;
+cursor:pointer;
+font-weight:bold;
+margin-top:12px;
+background:linear-gradient(135deg,#7dd3fc,#c084fc);
+color:black;
+transition:.3s;
+}
+.btn:hover{transform:scale(1.05)}
+
+/* ===== GRID ===== */
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-top:15px;
+}
+
+.tile{
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.1);
+padding:15px;
+border-radius:15px;
+}
+
+/* ===== SCROLL ANIMATION ===== */
+.reveal{
+opacity:0;
+transform:translateY(40px);
+transition:all .8s cubic-bezier(.17,.67,.29,1);
+}
+
+.reveal.show{
+opacity:1;
+transform:translateY(0);
+}
+
+@media(max-width:900px){
+.grid{grid-template-columns:1fr}
+h1{font-size:34px}
+}
+
+</style>
 </head>
+
 <body>
-  <canvas id="bg"></canvas>
-  <div class="overlay"></div>
 
-  <div class="wrap">
-    <div class="top">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title">SugarPie <span class="pill">✨ sweet & clean</span></div>
-          <div class="tag">Not “another server”. More like your daily Minecraft home.</div>
-        </div>
-      </div>
-      <div class="actions">
-        <a class="btn" href="#starter">3-Minute Starter</a>
-        <a class="btn" href="#rules">Sweet Rules</a>
-        <a class="btn primary" href="YOUR_DISCORD_INVITE_LINK" target="_blank" rel="noreferrer">Join Discord</a>
-      </div>
-    </div>
+<canvas id="bg"></canvas>
 
-    <div class="hero">
-      <!-- Left hero -->
-      <div class="card">
-        <div class="h1">Welcome to <span class="grad">SugarPie</span></div>
-        <div class="p">
-          Cozy grind + clean PvP. No loud chaos, no toxic spam.
-          Just smooth gameplay, weekly events, and a community that actually replies.
-        </div>
+<!-- NAV -->
+<div class="nav">
+<div class="brand">SugarPie</div>
 
-        <div class="ipbox">
-          <div class="ip" id="ipText">play.sugarpie.xyz</div>
-          <button class="mini" id="copyBtn">Copy IP</button>
-        </div>
+<div class="tabs">
+<a class="tab" href="#vibe">Vibe</a>
+<a class="tab" href="#starter">Starter</a>
+<a class="tab" href="#rules">Rules</a>
+</div>
+</div>
 
-        <div class="row">
-          <a class="btn primary" href="YOUR_STORE_LINK" target="_blank" rel="noreferrer">Store</a>
-          <a class="btn" href="YOUR_VOTE_LINK" target="_blank" rel="noreferrer">Vote</a>
-          <a class="btn" href="#vibe">What you’ll feel</a>
-        </div>
+<div class="wrap">
 
-        <div class="row" style="margin-top:12px">
-          <span class="pill">⚡ lag-free</span>
-          <span class="pill">🛡️ fair staff</span>
-          <span class="pill">🎉 weekly events</span>
-          <span class="pill">💎 balanced economy</span>
-        </div>
-      </div>
+<!-- HERO -->
+<div class="card reveal">
+<h1>Welcome to <span class="grad">SugarPie</span></h1>
+<p>Cozy grind, smooth gameplay, clean PvP, weekly events.</p>
+<button class="btn" onclick="copyIP()">Copy Server IP</button>
+</div>
 
-      <!-- Right card -->
-      <div class="card">
-        <div class="sectionTitle">
-          <h2>Server Snapshot</h2>
-          <span class="pill">Java + Bedrock</span>
-        </div>
-        <div class="hr"></div>
+<!-- VIBE -->
+<div class="card reveal" id="vibe">
+<h2>Server Vibe</h2>
+<div class="grid">
+<div class="tile">⚡ Lag free gameplay</div>
+<div class="tile">🛡️ Fair staff</div>
+<div class="tile">🎉 Weekly events</div>
+</div>
+</div>
 
-        <div class="grid" style="grid-template-columns:1fr; margin-top:12px">
-          <div class="tile">
-            <b>Why people stay</b>
-            <div class="small">Progress feels rewarding. PvP feels fair. The vibe stays chill.</div>
-          </div>
-          <div class="tile">
-            <b>Version</b>
-            <div class="small">Java: 1.20+ • Bedrock: supported (Geyser)</div>
-          </div>
-          <div class="tile">
-            <b>Support</b>
-            <div class="small">Discord tickets + quick replies. No “seen” and ignore.</div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- STARTER -->
+<div class="card reveal" id="starter">
+<h2>3 Minute Starter</h2>
+<div class="grid">
+<div class="tile">Join server</div>
+<div class="tile">Claim base</div>
+<div class="tile">Start grinding</div>
+</div>
+</div>
 
-    <!-- Unique vibe section -->
-    <div class="card" id="vibe">
-      <div class="sectionTitle">
-        <h2>What you’ll feel on SugarPie</h2>
-        <span class="pill">🌙 cozy mode</span>
-      </div>
-      <div class="hr"></div>
+<!-- RULES -->
+<div class="card reveal" id="rules">
+<h2>Rules</h2>
+<div class="grid">
+<div class="tile">No hacks</div>
+<div class="tile">No toxicity</div>
+<div class="tile">Respect players</div>
+</div>
+</div>
 
-      <div class="grid" style="margin-top:12px">
-        <div class="tile">
-          <b>Calm grind</b>
-          <div class="small">Build, trade, explore — without constant drama.</div>
-        </div>
-        <div class="tile">
-          <b>Clean fights</b>
-          <div class="small">PvP that rewards skill, not dirty tricks.</div>
-        </div>
-        <div class="tile">
-          <b>Daily drops</b>
-          <div class="small">Small rewards/events so it never feels dead.</div>
-        </div>
-      </div>
-    </div>
+</div>
 
-    <!-- Starter -->
-    <div class="card" id="starter">
-      <div class="sectionTitle">
-        <h2>3-Minute Starter</h2>
-        <span class="pill">⏱️ fast</span>
-      </div>
-      <div class="hr"></div>
+<script>
 
-      <div class="grid" style="margin-top:12px">
-        <div class="tile">
-          <b>Step 1</b>
-          <div class="small">Join Discord → read #start-here → get updates & support.</div>
-        </div>
-        <div class="tile">
-          <b>Step 2</b>
-          <div class="small">Copy IP → join → claim your spot → start your first base.</div>
-        </div>
-        <div class="tile">
-          <b>Step 3</b>
-          <div class="small">Vote once → small boosts → easy start (no pay-to-win).</div>
-        </div>
-      </div>
-    </div>
+/* ===== COPY IP ===== */
+function copyIP(){
+navigator.clipboard.writeText("play.sugarpie.xyz");
+}
 
-    <!-- Rules -->
-    <div class="card" id="rules">
-      <div class="sectionTitle">
-        <h2>Sweet Rules</h2>
-        <span class="pill">🍬 keep it sweet</span>
-      </div>
-      <div class="hr"></div>
+/* ===== SCROLL REVEAL ===== */
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(e=>{
+if(e.isIntersecting)e.target.classList.add("show");
+});
+},{threshold:.15});
 
-      <div class="grid" style="margin-top:12px">
-        <div class="tile"><b>No hacks</b><div class="small">X-ray / clients / exploits = instant action.</div></div>
-        <div class="tile"><b>No toxicity</b><div class="small">Respect players. Don’t ruin vibes.</div></div>
-        <div class="tile"><b>No scams</b><div class="small">Trades must be fair. Zero drama economy.</div></div>
-      </div>
-      <div class="small" style="margin-top:12px;opacity:.8">Staff decisions are final • Appeal available on Discord</div>
-    </div>
+document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
 
-    <div class="footer">© <span id="y"></span> SugarPie • Not affiliated with Mojang/Microsoft</div>
-  </div>
+/* ===== 4D DOT BACKGROUND ===== */
+const c=document.getElementById("bg");
+const ctx=c.getContext("2d");
 
-  <script>
-    // ===== EDIT THESE =====
-    const SERVER_IP = "play.sugarpie.xyz"; // change to your real IP
-    // ======================
+function resize(){
+c.width=innerWidth;
+c.height=innerHeight;
+}
+resize();
+window.onresize=resize;
 
-    document.getElementById("y").textContent = new Date().getFullYear();
-    document.getElementById("ipText").textContent = SERVER_IP;
+let mouse={x:0,y:0};
+window.onmousemove=e=>{
+mouse.x=e.clientX;
+mouse.y=e.clientY;
+}
 
-    // Toast
-    let toastTimer;
-    function toast(msg){
-      clearTimeout(toastTimer);
-      let el = document.getElementById("toast");
-      if(!el){
-        el = document.createElement("div");
-        el.id = "toast";
-        Object.assign(el.style,{
-          position:"fixed", left:"50%", bottom:"26px",
-          transform:"translateX(-50%)",
-          padding:"10px 14px", borderRadius:"14px",
-          border:"1px solid rgba(255,255,255,.14)",
-          background:"rgba(0,0,0,.55)",
-          backdropFilter:"blur(10px)",
-          color:"rgba(246,247,255,.92)",
-          fontFamily:"inherit", fontSize:"14px",
-          zIndex:"50", opacity:"0", transition:"opacity .15s ease"
-        });
-        document.body.appendChild(el);
-      }
-      el.textContent = msg;
-      el.style.opacity = "1";
-      toastTimer = setTimeout(()=> el.style.opacity="0", 1200);
-    }
+let dots=[];
+for(let i=0;i<220;i++){
+dots.push({
+x:Math.random()*innerWidth,
+y:Math.random()*innerHeight,
+z:Math.random()+.5
+});
+}
 
-    document.getElementById("copyBtn").addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(SERVER_IP); toast("Copied: " + SERVER_IP); }
-      catch {
-        const t=document.createElement("textarea");
-        t.value=SERVER_IP; document.body.appendChild(t);
-        t.select(); document.execCommand("copy");
-        document.body.removeChild(t);
-        toast("Copied: " + SERVER_IP);
-      }
-    });
+function draw(){
+ctx.clearRect(0,0,c.width,c.height);
 
-    // ===== Background: Sugar Dust Particles (more unique than plain dots) =====
-    const canvas = document.getElementById("bg");
-    const ctx = canvas.getContext("2d", { alpha:true });
+dots.forEach(d=>{
+let dx=d.x-mouse.x;
+let dy=d.y-mouse.y;
+let dist=Math.sqrt(dx*dx+dy*dy);
+let lift=Math.max(0,1-dist/200);
 
-    let W,H,DPR;
-    function resize(){
-      DPR = Math.min(2, window.devicePixelRatio || 1);
-      W = canvas.width = Math.floor(innerWidth * DPR);
-      H = canvas.height = Math.floor(innerHeight * DPR);
-      canvas.style.width = innerWidth + "px";
-      canvas.style.height = innerHeight + "px";
-    }
-    window.addEventListener("resize", resize, {passive:true});
-    resize();
+ctx.beginPath();
+ctx.arc(d.x,d.y,d.z*2+lift*5,0,Math.PI*2);
+ctx.fillStyle="rgba(255,255,255,"+(0.3+d.z)+")";
+ctx.fill();
 
-    const mouse = { x: innerWidth/2, y: innerHeight/2, vx:0, vy:0 };
-    window.addEventListener("mousemove",(e)=>{
-      mouse.vx = e.clientX - mouse.x;
-      mouse.vy = e.clientY - mouse.y;
-      mouse.x = e.clientX; mouse.y = e.clientY;
-    }, {passive:true});
+d.x+=Math.sin(d.z)*.3;
+d.y+=Math.cos(d.z)*.3;
 
-    const rand=(a,b)=>a+Math.random()*(b-a);
-    const COLORS = [
-      [110,231,255], // cyan
-      [255,155,213], // pink
-      [167,139,250], // purple
-      [255,255,255]  // white
-    ];
+if(d.x>innerWidth)d.x=0;
+if(d.y>innerHeight)d.y=0;
+});
 
-    const COUNT = 240;
-    const p = [];
-    for(let i=0;i<COUNT;i++){
-      const col = COLORS[Math.floor(Math.random()*COLORS.length)];
-      p.push({
-        x: rand(0, innerWidth),
-        y: rand(0, innerHeight),
-        z: rand(0.25, 1.05),
-        r: rand(0.6, 1.7),
-        sx: rand(-0.14, 0.14),
-        sy: rand(-0.12, 0.12),
-        phase: rand(0, Math.PI*2),
-        cr: col[0], cg: col[1], cb: col[2]
-      });
-    }
+requestAnimationFrame(draw);
+}
+draw();
 
-    function frame(t){
-      ctx.clearRect(0,0,W,H);
-      const mx = mouse.x * DPR, my = mouse.y * DPR;
+</script>
 
-      for(let i=0;i<COUNT;i++){
-        const d = p[i];
-
-        // drift + loop
-        d.x += d.sx * (0.6 + d.z);
-        d.y += d.sy * (0.6 + d.z);
-
-        // time wobble (gives "alive" feel)
-        const wob = Math.sin(t*0.0016 + d.phase) * (0.35 + 0.9*d.z);
-        d.x += wob * 0.05;
-        d.y += Math.cos(t*0.0012 + d.phase) * 0.03;
-
-        if(d.x < -30) d.x = innerWidth + 30;
-        if(d.x > innerWidth + 30) d.x = -30;
-        if(d.y < -30) d.y = innerHeight + 30;
-        if(d.y > innerHeight + 30) d.y = -30;
-
-        // mouse lift (4D vibe)
-        const dx = d.x - mouse.x, dy = d.y - mouse.y;
-        const dist = Math.hypot(dx,dy);
-        const infl = Math.max(0, 1 - dist/240);   // 0..1
-        const z = d.z + infl * 0.65;
-        const par = (z - 0.25) * 18;
-
-        const px = d.x * DPR;
-        const py = d.y * DPR;
-
-        const sx = px + ((px - mx)/(240*DPR))*par + (mouse.vx*0.02*infl)*DPR;
-        const sy = py + ((py - my)/(240*DPR))*par + (mouse.vy*0.02*infl)*DPR;
-
-        const radius = (d.r + infl*2.2) * DPR * (0.75 + z);
-        const alpha = 0.18 + 0.55*z + infl*0.25;
-
-        // soft glow
-        ctx.beginPath();
-        ctx.arc(sx, sy, radius*2.2, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(${d.cr},${d.cg},${d.cb},${Math.min(0.16, alpha*0.12)})`;
-        ctx.fill();
-
-        // core particle
-        ctx.beginPath();
-        ctx.arc(sx, sy, radius, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(${d.cr},${d.cg},${d.cb},${Math.min(0.92, alpha)})`;
-        ctx.fill();
-
-        // little sparkle line near cursor
-        if(infl > 0.55){
-          ctx.strokeStyle = `rgba(255,255,255,${0.10 + infl*0.12})`;
-          ctx.lineWidth = 1 * DPR;
-          ctx.beginPath();
-          ctx.moveTo(sx - 6*DPR, sy);
-          ctx.lineTo(sx + 6*DPR, sy);
-          ctx.stroke();
-        }
-      }
-
-      requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-  </script>
 </body>
 </html>
