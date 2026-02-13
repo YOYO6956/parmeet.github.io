@@ -1,685 +1,246 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SugarPie • Minecraft Server</title>
-<meta name="description" content="SugarPie — a neon-smooth Minecraft hub. Join Discord, copy IP, and play." />
-
-<style>
-  :root{
-    --bg:#04050a;
-    --text:#f6f7ff;
-    --muted:rgba(246,247,255,.70);
-    --glass:rgba(255,255,255,.06);
-    --stroke:rgba(255,255,255,.12);
-    --a:#7dd3fc;   /* blue */
-    --b:#c084fc;   /* purple */
-    --c:#ff9bd5;   /* pink */
-    --d:#4ade80;   /* green */
-  }
-
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    overflow-x:hidden;
-  }
-
-  /* ===== INSANE BACKGROUND LAYERS ===== */
-  #fx{position:fixed; inset:0; width:100%; height:100%; z-index:-3; display:block;}
-  .aurora{
-    position:fixed; inset:-40px; z-index:-2; pointer-events:none;
-    background:
-      radial-gradient(900px 700px at 10% 20%, rgba(125,211,252,.18), transparent 60%),
-      radial-gradient(900px 700px at 90% 20%, rgba(255,155,213,.16), transparent 60%),
-      radial-gradient(900px 700px at 55% 115%, rgba(192,132,252,.18), transparent 60%),
-      radial-gradient(900px 700px at 50% 40%, rgba(74,222,128,.07), transparent 55%),
-      radial-gradient(1200px 900px at 50% 50%, transparent 35%, rgba(0,0,0,.70) 100%);
-    filter:saturate(1.25);
-  }
-  .scanlines{
-    position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(255,255,255,.03) 0px,
-      rgba(255,255,255,.03) 1px,
-      transparent 2px,
-      transparent 6px
-    );
-    mix-blend-mode: overlay;
-    opacity:.22;
-  }
-
-  /* Cursor glow */
-  .cursorGlow{
-    position:fixed; width:24px; height:24px; border-radius:999px;
-    left:0; top:0; transform:translate(-50%,-50%);
-    pointer-events:none; z-index:50;
-    background:radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,0) 60%);
-    filter: blur(0px);
-    opacity:.0;
-    transition:opacity .2s ease;
-  }
-
-  /* ===== LAYOUT ===== */
-  .wrap{max-width:1100px;margin:0 auto;padding:20px 18px 90px}
-
-  /* INSANE header */
-  .topbar{
-    position:sticky; top:12px; z-index:10;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    padding:12px 12px;
-    border-radius:22px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(0,0,0,.40);
-    backdrop-filter: blur(16px);
-    box-shadow:0 28px 110px rgba(0,0,0,.62);
-  }
-  .brand{
-    display:flex; align-items:center; gap:12px;
-    min-width:220px;
-  }
-  .logo{
-    width:44px;height:44px;border-radius:18px;
-    background:conic-gradient(from 180deg, var(--a), var(--c), var(--b), var(--d), var(--a));
-    box-shadow:0 22px 90px rgba(255,155,213,.12);
-  }
-  .brand .name{
-    font-weight:1000; letter-spacing:.2px; line-height:1.05;
-    font-size:15px;
-  }
-  .brand .sub{
-    color:rgba(246,247,255,.60);
-    font-size:12px;
-    margin-top:3px;
-  }
-
-  .tabs{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-  .tab{
-    position:relative;
-    padding:10px 14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.03);
-    color:rgba(246,247,255,.92);
-    text-decoration:none;
-    font-weight:900;
-    font-size:13px;
-    user-select:none;
-    transition:transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
-    overflow:hidden;
-  }
-  .tab:hover{
-    transform:translateY(-2px);
-    background:rgba(255,255,255,.06);
-    border-color:rgba(255,255,255,.18);
-  }
-  .tab.active{
-    background:linear-gradient(135deg, rgba(125,211,252,.18), rgba(255,155,213,.14), rgba(192,132,252,.16));
-    border-color:rgba(255,255,255,.18);
-  }
-  .tab::after{
-    content:"";
-    position:absolute; left:12px; right:12px; bottom:8px;
-    height:2px; border-radius:999px;
-    background:linear-gradient(90deg,var(--a),var(--c),var(--b),var(--d));
-    opacity:0; transform:scaleX(.4);
-    transition:opacity .2s ease, transform .2s ease;
-  }
-  .tab.active::after{opacity:1; transform:scaleX(1)}
-  .tab.primary{
-    border:0;
-    color:#0a0d16;
-    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-    box-shadow:0 20px 90px rgba(125,211,252,.14);
-  }
-  .tab.primary::after{display:none}
-
-  /* Sections */
-  .hero{
-    margin-top:18px;
-    display:grid;
-    grid-template-columns:1.25fr .75fr;
-    gap:14px;
-    align-items:stretch;
-  }
-
-  .card{
-    border:1px solid rgba(255,255,255,.12);
-    background:var(--glass);
-    border-radius:26px;
-    padding:18px;
-    backdrop-filter: blur(14px);
-    box-shadow:0 30px 130px rgba(0,0,0,.58);
-    transform-style:preserve-3d;
-  }
-
-  .reveal{
-    opacity:0;
-    transform:translateY(26px) scale(.985);
-    transition:opacity .75s cubic-bezier(.16,.75,.25,1),
-               transform .75s cubic-bezier(.16,.75,.25,1);
-    will-change:opacity, transform;
-  }
-  .reveal.show{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-
-  .title{
-    margin:0;
-    font-size:52px;
-    line-height:1.0;
-    letter-spacing:-1px;
-  }
-  .grad{
-    background:linear-gradient(135deg,var(--a),var(--c),var(--b),var(--d));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .desc{margin:10px 0 0; color:var(--muted); line-height:1.65}
-
-  .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
-  .pill{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:8px 10px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.03);
-    color:rgba(246,247,255,.85);
-    font-size:12px;
-    user-select:none;
-  }
-
-  .ipbox{
-    display:flex; gap:10px; align-items:center;
-    padding:12px; border-radius:18px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(0,0,0,.18);
-    margin-top:12px;
-  }
-  .ip{
-    flex:1;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-    font-size:14px;
-    color:rgba(246,247,255,.92);
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-
-  .btn{
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.03);
-    color:var(--text);
-    padding:10px 14px;
-    border-radius:16px;
-    cursor:pointer;
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center; gap:9px;
-    font-weight:950;
-    font-size:13px;
-    user-select:none;
-    transition:transform .15s ease, background .15s ease, border-color .15s ease;
-  }
-  .btn:hover{transform:translateY(-2px); background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18)}
-  .btn.primary{
-    border:0;
-    color:#0a0d16;
-    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-    box-shadow:0 18px 90px rgba(255,155,213,.12);
-  }
-
-  .grid{
-    margin-top:12px;
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
-  }
-  .tile{
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.03);
-    border-radius:20px;
-    padding:14px;
-  }
-  .tile b{display:block;margin-bottom:6px}
-  .small{color:rgba(246,247,255,.62);font-size:13px;line-height:1.55}
-
-  .sectionTitle{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    margin-bottom:10px;
-  }
-  .sectionTitle h2{margin:0;font-size:15px;letter-spacing:.2px}
-  .hr{height:1px;background:rgba(255,255,255,.10);border-radius:999px;margin:10px 0 0}
-
-  .footer{
-    margin-top:26px;
-    text-align:center;
-    color:rgba(246,247,255,.55);
-    font-size:13px;
-  }
-
-  /* Toast */
-  #toast{
-    position:fixed; left:50%; bottom:22px;
-    transform:translateX(-50%);
-    padding:10px 14px;
-    border-radius:14px;
-    background:rgba(0,0,0,.62);
-    border:1px solid rgba(255,255,255,.12);
-    backdrop-filter: blur(10px);
-    color:#fff;
-    font-weight:700;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .2s ease;
-    z-index:99;
-  }
-
-  @media (max-width:900px){
-    .hero{grid-template-columns:1fr}
-    .title{font-size:38px}
-    .grid{grid-template-columns:1fr}
-    .brand{min-width:auto}
-  }
-  @media (prefers-reduced-motion: reduce){
-    .reveal{opacity:1; transform:none; transition:none}
-    .cursorGlow{display:none}
-  }
-</style>
-</head>
-
-<body>
-<canvas id="fx"></canvas>
-<div class="aurora"></div>
-<div class="scanlines"></div>
-<div class="cursorGlow" id="cursorGlow"></div>
-<div id="toast"></div>
-
-<div class="wrap">
-
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo"></div>
-      <div>
-        <div class="name">SugarPie</div>
-        <div class="sub">Neon-smooth Minecraft hub • clicks feel like magic</div>
-      </div>
-    </div>
-    <div class="tabs">
-      <a class="tab" href="#home" data-sec="home">Home</a>
-      <a class="tab" href="#discord" data-sec="discord">Discord</a>
-      <a class="tab" href="#how" data-sec="how">How</a>
-      <a class="tab" href="#rules" data-sec="rules">Rules</a>
-      <a class="tab primary" href="https://discord.gg/study" target="_blank" rel="noreferrer">Join</a>
-    </div>
-  </div>
-
-  <!-- HERO -->
-  <div class="hero" id="home">
-    <div class="card reveal tilt">
-      <h1 class="title">Welcome to <span class="grad">SugarPie</span></h1>
-      <div class="desc">
-        A server that looks clean, runs smooth, and feels fair.
-        No noisy chaos — just cozy grind, weekly events, and a community that actually helps.
-      </div>
-
-      <div class="ipbox">
-        <div class="ip" reminds="ip" id="ipText">play.sugarpie.xyz</div>
-        <button class="btn" id="copyIp">📋 Copy IP</button>
-      </div>
-
-      <div class="row">
-        <a class="btn primary" href="#discord">💬 Discord Hub</a>
-        <a class="btn" href="#how">⚡ 3-Min Starter</a>
-        <a class="btn" href="#rules">🛡️ Rules</a>
-      </div>
-
-      <div class="row" style="margin-top:12px">
-        <span class="pill">⚡ lag-free</span>
-        <span class="pill">🧠 smart economy</span>
-        <span class="pill">🎉 weekly events</span>
-        <span class="pill">🛡️ fair staff</span>
-      </div>
-    </div>
-
-    <div class="card reveal tilt">
-      <div class="sectionTitle">
-        <h2>Live Vibe</h2>
-        <span class="pill">✨ neon mode</span>
-      </div>
-      <div class="hr"></div>
-
-      <div class="grid" style="grid-template-columns:1fr; margin-top:12px">
-        <div class="tile">
-          <b>Feels different</b>
-          <div class="small">This page reacts to your mouse — your users will notice instantly.</div>
-        </div>
-        <div class="tile">
-          <b>Fast join</b>
-          <div class="small">Copy IP, join Discord, and you’re in — no confusion.</div>
-        </div>
-        <div class="tile">
-          <b>Community first</b>
-          <div class="small">Updates + support + events live in Discord.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DISCORD -->
-  <div class="card reveal" id="discord" style="margin-top:14px">
-    <div class="sectionTitle">
-      <h2>Discord Hub</h2>
-      <span class="pill">https://discord.gg/study</span>
-    </div>
-    <div class="hr"></div>
-
-    <div class="grid" style="margin-top:12px">
-      <div class="tile"><b>📢 Updates</b><div class="small">Announcements, changelogs, events.</div></div>
-      <div class="tile"><b>🛠️ Support</b><div class="small">Tickets, reports, staff help.</div></div>
-      <div class="tile"><b>🎁 Giveaways</b><div class="small">Drops, rewards, community fun.</div></div>
-    </div>
-
-    <div class="row">
-      <a class="btn primary" href="https://discord.gg/study" target="_blank" rel="noreferrer">🚀 Join Discord</a>
-      <button class="btn" id="copyDiscord">📋 Copy Invite</button>
-    </div>
-  </div>
-
-  <!-- HOW -->
-  <div class="card reveal" id="how">
-    <div class="sectionTitle">
-      <h2>3-Minute Starter</h2>
-      <span class="pill">⏱️ fast</span>
-    </div>
-    <div class="hr"></div>
-
-    <div class="grid" style="margin-top:12px">
-      <div class="tile"><b>Step 1</b><div class="small">Click Join Discord → read #start-here.</div></div>
-      <div class="tile"><b>Step 2</b><div class="small">Copy IP → join server → claim base.</div></div>
-      <div class="tile"><b>Step 3</b><div class="small">Play events → earn rewards → flex.</div></div>
-    </div>
-  </div>
-
-  <!-- RULES -->
-  <div class="card reveal" id="rules">
-    <div class="sectionTitle">
-      <h2>Rules</h2>
-      <span class="pill">🍬 keep it sweet</span>
-    </div>
-    <div class="hr"></div>
-
-    <div class="grid" style="margin-top:12px">
-      <div class="tile"><b>No hacks</b><div class="small">X-ray / clients / exploits = action.</div></div>
-      <div class="tile"><b>No toxicity</b><div class="small">Respect players, keep chat clean.</div></div>
-      <div class="tile"><b>No scams</b><div class="small">Fair trades only, zero drama economy.</div></div>
-    </div>
-    <div class="small" style="margin-top:12px;opacity:.85">Staff decision final • Appeal on Discord</div>
-  </div>
-
-  <div class="footer">© <span id="y"></span> SugarPie • Not affiliated with Mojang/Microsoft</div>
-</div>
-
-<script>
-/* =========================
-   EDIT THESE 2 THINGS ONLY
-========================= */
-const SERVER_IP = "play.sugarpie.xyz";              // <- change to your real server IP
-const DISCORD_INVITE = "https://discord.gg/study";  // <- your invite (already set)
-/* ========================= */
-
-document.getElementById("y").textContent = new Date().getFullYear();
-document.getElementById("ipText").textContent = SERVER_IP;
-
-/* Toast */
-let toastTimer;
-function toast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.style.opacity = "1";
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> t.style.opacity="0", 1200);
-}
-
-/* Copy buttons */
-document.getElementById("copyIp").addEventListener("click", async ()=>{
-  try{ await navigator.clipboard.writeText(SERVER_IP); toast("Copied IP: " + SERVER_IP); shock(); }
-  catch{ toast("Copy failed (browser)"); }
-});
-document.getElementById("copyDiscord").addEventListener("click", async ()=>{
-  try{ await navigator.clipboard.writeText(DISCORD_INVITE); toast("Copied Discord: " + DISCORD_INVITE); shock(); }
-  catch{ toast("Copy failed (browser)"); }
-});
-
-/* Reveal on scroll */
-const reveals = document.querySelectorAll(".reveal");
-const io = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add("show"); });
-},{threshold:0.12});
-reveals.forEach(el=>io.observe(el));
-
-/* Active tabs */
-const tabs = Array.from(document.querySelectorAll(".tab[data-sec]"));
-const secs = tabs.map(t=>document.getElementById(t.dataset.sec)).filter(Boolean);
-const tio = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      tabs.forEach(t=>t.classList.remove("active"));
-      const m = tabs.find(t=>t.dataset.sec===e.target.id);
-      if(m) m.classList.add("active");
-    }
-  });
-},{threshold:0.55});
-secs.forEach(s=>tio.observe(s));
-if(tabs[0]) tabs[0].classList.add("active");
-
-/* 3D tilt (insane premium) */
-function addTilt(el){
-  const strength = 10;
-  el.addEventListener("mousemove",(ev)=>{
-    const r = el.getBoundingClientRect();
-    const px = (ev.clientX - r.left)/r.width - 0.5;
-    const py = (ev.clientY - r.top)/r.height - 0.5;
-    el.style.transform = `rotateY(${px*strength}deg) rotateX(${(-py)*strength}deg)`;
-  });
-  el.addEventListener("mouseleave",()=> el.style.transform = "rotateY(0deg) rotateX(0deg)");
-}
-document.querySelectorAll(".tilt").forEach(addTilt);
-
-/* Cursor glow + trail */
-const glow = document.getElementById("cursorGlow");
-let mouse = {x: innerWidth/2, y: innerHeight/2, vx:0, vy:0, seen:false};
-window.addEventListener("mousemove",(e)=>{
-  mouse.vx = e.clientX - mouse.x;
-  mouse.vy = e.clientY - mouse.y;
-  mouse.x = e.clientX; mouse.y = e.clientY;
-  mouse.seen = true;
-  glow.style.opacity = "0.9";
-},{passive:true});
-window.addEventListener("mouseleave",()=> glow.style.opacity="0");
-
-/* Click shockwave + sparkles (very insane) */
-let last = {x: innerWidth/2, y: innerHeight/2};
-window.addEventListener("mousemove",(e)=>{ last.x=e.clientX; last.y=e.clientY; },{passive:true});
-
-function shock(){
-  // ring
-  const ring = document.createElement("div");
-  ring.style.position="fixed";
-  ring.style.left=last.x+"px";
-  ring.style.top=last.y+"px";
-  ring.style.width="14px";
-  ring.style.height="14px";
-  ring.style.borderRadius="999px";
-  ring.style.transform="translate(-50%,-50%) scale(1)";
-  ring.style.border="2px solid rgba(255,255,255,.55)";
-  ring.style.boxShadow="0 0 40px rgba(125,211,252,.25)";
-  ring.style.pointerEvents="none";
-  ring.style.zIndex="80";
-  ring.style.opacity="1";
-  ring.style.transition="transform .6s ease, opacity .6s ease";
-  document.body.appendChild(ring);
-  requestAnimationFrame(()=>{
-    ring.style.transform="translate(-50%,-50%) scale(14)";
-    ring.style.opacity="0";
-  });
-  setTimeout(()=>ring.remove(), 650);
-
-  // sparks
-  const n=16;
-  for(let i=0;i<n;i++){
-    const s=document.createElement("div");
-    const size=4+Math.random()*7;
-    const a=Math.random()*Math.PI*2;
-    const dist=26+Math.random()*60;
-    const x=last.x+Math.cos(a)*dist;
-    const y=last.y+Math.sin(a)*dist;
-
-    s.style.position="fixed";
-    s.style.left=(last.x-size/2)+"px";
-    s.style.top=(last.y-size/2)+"px";
-    s.style.width=size+"px";
-    s.style.height=size+"px";
-    s.style.borderRadius="999px";
-    s.style.pointerEvents="none";
-    s.style.zIndex="80";
-    s.style.background="linear-gradient(135deg, rgba(125,211,252,.95), rgba(255,155,213,.95), rgba(192,132,252,.95), rgba(74,222,128,.75))";
-    s.style.opacity="1";
-    s.style.transform="translate(0,0) scale(1)";
-    s.style.transition="transform .55s ease, opacity .55s ease, filter .55s ease";
-    document.body.appendChild(s);
-
-    requestAnimationFrame(()=>{
-      s.style.transform=`translate(${x-last.x}px,${y-last.y}px) scale(.35)`;
-      s.style.opacity="0";
-      s.style.filter="blur(2px)";
-    });
-    setTimeout(()=>s.remove(),600);
-  }
-}
-
-/* ===== INSANE FX CANVAS: 4D particle field + trails ===== */
-const canvas = document.getElementById("fx");
-const ctx = canvas.getContext("2d", {alpha:true});
-let W,H,DPR;
-function resize(){
-  DPR = Math.min(2, window.devicePixelRatio || 1);
-  W = canvas.width = Math.floor(innerWidth * DPR);
-  H = canvas.height = Math.floor(innerHeight * DPR);
-  canvas.style.width = innerWidth + "px";
-  canvas.style.height = innerHeight + "px";
-}
-window.addEventListener("resize", resize, {passive:true});
-resize();
-
-const COLORS = [
-  [125,211,252], [255,155,213], [192,132,252], [74,222,128], [255,255,255]
-];
-
-const COUNT = 320;                 // insane but safe (DPR capped)
-const particles = [];
-const rand=(a,b)=>a+Math.random()*(b-a);
-
-for(let i=0;i<COUNT;i++){
-  const col = COLORS[Math.floor(Math.random()*COLORS.length)];
-  particles.push({
-    x: rand(0, innerWidth),
-    y: rand(0, innerHeight),
-    z: rand(0.25, 1.15),
-    r: rand(0.5, 1.8),
-    sx: rand(-0.18, 0.18),
-    sy: rand(-0.14, 0.14),
-    phase: rand(0, Math.PI*2),
-    cr: col[0], cg: col[1], cb: col[2]
-  });
-}
-
-function loop(t){
-  // motion blur trail effect
-  ctx.fillStyle = "rgba(4,5,10,0.22)";
-  ctx.fillRect(0,0,W,H);
-
-  // cursor glow follow
-  if(mouse.seen){
-    glow.style.left = mouse.x + "px";
-    glow.style.top  = mouse.y + "px";
-  }
-
-  const mx = mouse.x * DPR, my = mouse.y * DPR;
-
-  for(let i=0;i<COUNT;i++){
-    const p = particles[i];
-
-    // drift
-    p.x += p.sx * (0.65 + p.z);
-    p.y += p.sy * (0.65 + p.z);
-
-    // 4D wobble
-    const wob = Math.sin(t*0.0016 + p.phase) * (0.35 + 0.9*p.z);
-    p.x += wob * 0.06;
-    p.y += Math.cos(t*0.0012 + p.phase) * 0.04;
-
-    // wrap
-    if(p.x < -40) p.x = innerWidth + 40;
-    if(p.x > innerWidth + 40) p.x = -40;
-    if(p.y < -40) p.y = innerHeight + 40;
-    if(p.y > innerHeight + 40) p.y = -40;
-
-    // mouse lift (depth)
-    const dx = p.x - mouse.x, dy = p.y - mouse.y;
-    const dist = Math.hypot(dx,dy);
-    const infl = Math.max(0, 1 - dist/260);
-    const z = p.z + infl*0.85;
-    const par = (z - 0.25) * 22;
-
-    const px = p.x * DPR;
-    const py = p.y * DPR;
-
-    // parallax shift + velocity shimmer
-    const sx = px + ((px - mx)/(260*DPR))*par + (mouse.vx*0.018*infl)*DPR;
-    const sy = py + ((py - my)/(260*DPR))*par + (mouse.vy*0.018*infl)*DPR;
-
-    const radius = (p.r + infl*2.6) * DPR * (0.70 + z);
-    const alpha = 0.10 + 0.55*z + infl*0.22;
-
-    // glow
-    ctx.beginPath();
-    ctx.arc(sx, sy, radius*2.4, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(${p.cr},${p.cg},${p.cb},${Math.min(0.16, alpha*0.10)})`;
-    ctx.fill();
-
-    // core
-    ctx.beginPath();
-    ctx.arc(sx, sy, radius, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(${p.cr},${p.cg},${p.cb},${Math.min(0.88, alpha)})`;
-    ctx.fill();
-
-    // tiny connection lines near cursor = “insane”
-    if(infl > 0.55){
-      for(let j=i+1;j<i+9 && j<COUNT;j++){
-        const q = particles[j];
-        const qx = q.x*DPR, qy=q.y*DPR;
-        const dd = Math.hypot(qx - px, qy - py);
-        if(dd < 160*DPR){
-          const a = (1 - dd/(160*DPR)) * 0.18 * infl;
-          ctx.strokeStyle = `rgba(255,255,255,${a})`;
-          ctx.lineWidth = 1 * DPR;
-          ctx.beginPath();
-          ctx.moveTo(sx, sy);
-          ctx.lineTo(qx, qy);
-          ctx.stroke();
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SugarPie Minecraft Server</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-      }
-    }
-  }
 
-  // decay velocity
-  mouse.vx *= 0.85; mouse.vy *= 0.85;
+        body {
+            background-color: #0b0914; /* Dark background */
+            color: #ffffff;
+            overflow-x: hidden;
+        }
 
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-</script>
+        /* 3D Particle Background Container */
+        #particles-js {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1; /* Puts it behind the content */
+        }
+
+        /* Main Content Wrapper */
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            min-height: 100vh;
+        }
+
+        /* Glowing Animated Title */
+        h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8b, #ff007f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 3s ease-in-out infinite;
+            text-shadow: 0px 10px 30px rgba(255, 0, 127, 0.4);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+        }
+
+        /* 3D Glass Cards */
+        .card-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px); /* Glass effect */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 400px;
+            transition: all 0.4s ease;
+            cursor: default;
+        }
+
+        /* Insane 3D Hover Effect */
+        .card:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateZ(20px) translateY(-10px);
+            box-shadow: -20px 20px 50px rgba(0, 0, 0, 0.5), 
+                        0px 0px 20px rgba(255, 0, 127, 0.3);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+        }
+
+        .card h2 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #ff6b6b;
+            padding-bottom: 10px;
+        }
+
+        /* Server IP Copy Box */
+        .ip-box {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            border: 1px dashed #ff007f;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff007f, #ff6b6b);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 0px 15px rgba(255, 107, 107, 0.8);
+        }
+
+        /* Rules List */
+        ul {
+            list-style: none;
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        ul li::before {
+            content: "⚔️";
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        /* Floating Animation for Title */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <h1>SugarPie</h1>
+        <div class="subtitle">The Sweetest Survival Network</div>
+
+        <div class="card-container">
+            
+            <div class="card">
+                <h2>How to Join</h2>
+                <p style="margin-bottom: 15px; color: #ddd;">Load up Minecraft (Java or Bedrock) and connect using the IP below!</p>
+                <div class="ip-box" id="server-ip">
+                    play.sugarpie.net
+                </div>
+                <button class="btn" onclick="copyIP()">Click to Copy IP</button>
+            </div>
+
+            <div class="card">
+                <h2>Server Rules</h2>
+                <ul>
+                    <li>No grieving or stealing from other players' bases.</li>
+                    <li>Be respectful in chat. No toxicity or harassment.</li>
+                    <li>No hacking, x-raying, or use of unfair clients.</li>
+                    <li>Keep the map clean (cut down whole trees!).</li>
+                    <li>Have fun and help out the community!</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Insane 3D Interactive Particles Configuration
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 100, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": ["#ff6b6b", "#ff007f", "#ffffff"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.7, "random": true },
+                "size": { "value": 4, "random": true },
+                "line_linked": { 
+                    "enable": true, 
+                    "distance": 150, 
+                    "color": "#ff6b6b", 
+                    "opacity": 0.4, 
+                    "width": 1.5 
+                },
+                "move": { 
+                    "enable": true, 
+                    "speed": 3, 
+                    "direction": "none", 
+                    "random": true, 
+                    "out_mode": "out" 
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "repulse" }, // Repulses dots when mouse gets near
+                    "onclick": { "enable": true, "mode": "push" },    // Adds dots on click
+                    "resize": true
+                },
+                "modes": {
+                    "repulse": { "distance": 100, "duration": 0.4 },
+                    "push": { "particles_nb": 4 }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Copy IP Script
+        function copyIP() {
+            const ip = document.getElementById("server-ip").innerText;
+            navigator.clipboard.writeText(ip);
+            const btn = document.querySelector(".btn");
+            btn.innerText = "IP Copied! ✅";
+            setTimeout(() => {
+                btn.innerText = "Click to Copy IP";
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
