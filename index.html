@@ -1,636 +1,406 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SugarPie • Minecraft Server</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SugarPie</title>
 
 <style>
-  :root{
-    --bg:#05060a;
-    --text:#f6f7ff;
-    --muted:rgba(246,247,255,.70);
-    --card:rgba(255,255,255,.06);
-    --stroke:rgba(255,255,255,.12);
-    --a:#7dd3fc;   /* blue */
-    --b:#c084fc;   /* purple */
-    --c:#ff9bd5;   /* pink */
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    overflow-x:hidden;
-  }
 
-  /* Background */
-  #bg{
-    position:fixed; inset:0;
-    width:100%; height:100%;
-    z-index:-2;
-    display:block;
-  }
-  .overlay{
-    position:fixed; inset:0; z-index:-1; pointer-events:none;
-    background:
-      radial-gradient(900px 600px at 12% 10%, rgba(255,155,213,.14), transparent 60%),
-      radial-gradient(900px 600px at 88% 14%, rgba(125,211,252,.16), transparent 60%),
-      radial-gradient(900px 600px at 55% 115%, rgba(192,132,252,.14), transparent 60%),
-      radial-gradient(1200px 900px at 50% 50%, transparent 35%, rgba(0,0,0,.62) 100%);
-  }
+/* ===== GLOBAL ===== */
+html{scroll-behavior:smooth;}
+body{
+margin:0;
+background:#05060a;
+color:white;
+font-family:system-ui;
+overflow-x:hidden;
+}
 
-  .wrap{max-width:1100px;margin:0 auto;padding:18px 18px 70px}
+canvas{
+position:fixed;
+top:0;left:0;
+z-index:-1;
+}
 
-  /* NAV */
-  .nav{
-    position:sticky; top:12px; z-index:10;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    padding:12px 12px;
-    border-radius:20px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(0,0,0,.38);
-    backdrop-filter: blur(14px);
-    box-shadow:0 26px 90px rgba(0,0,0,.6);
-  }
-  .brand{display:flex; align-items:center; gap:12px; min-width:220px}
-  .logo{
-    width:42px;height:42px;border-radius:16px;
-    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-    box-shadow:0 22px 70px rgba(255,155,213,.14);
-    flex:0 0 auto;
-  }
-  .title{font-weight:950; letter-spacing:.2px; line-height:1.05}
-  .tag{font-size:12px; color:rgba(246,247,255,.60); margin-top:3px}
+/* ===== NAVBAR ===== */
+.nav{
+position:sticky;
+top:10px;
+margin:20px auto;
+max-width:1100px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 18px;
+border-radius:18px;
+background:rgba(0,0,0,.4);
+border:1px solid rgba(255,255,255,.1);
+backdrop-filter:blur(15px);
+box-shadow:0 30px 100px rgba(0,0,0,.6);
+}
 
-  .tabs{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-  .tab{
-    position:relative;
-    padding:10px 14px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.03);
-    color:rgba(246,247,255,.90);
-    text-decoration:none;
-    font-weight:800;
-    font-size:13px;
-    user-select:none;
-    transition:transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
-    overflow:hidden;
-  }
-  .tab:hover{
-    transform:translateY(-2px);
-    border-color:rgba(255,255,255,.18);
-    background:rgba(255,255,255,.06);
-  }
-  .tab::after{
-    content:"";
-    position:absolute; left:12px; right:12px; bottom:8px;
-    height:2px; border-radius:999px;
-    background:linear-gradient(90deg,var(--a),var(--c),var(--b));
-    opacity:0; transform:scaleX(.4);
-    transition:opacity .2s ease, transform .2s ease;
-  }
-  .tab.active{
-    background:linear-gradient(135deg, rgba(125,211,252,.18), rgba(255,155,213,.14), rgba(192,132,252,.16));
-    border-color:rgba(255,255,255,.18);
-  }
-  .tab.active::after{opacity:1; transform:scaleX(1)}
+.brand{
+font-size:20px;
+font-weight:800;
+background:linear-gradient(90deg,#7dd3fc,#c084fc);
+-webkit-background-clip:text;
+color:transparent;
+}
 
-  .tab.primary{
-    border:0;
-    color:#0a0d16;
-    font-weight:950;
-    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-    box-shadow:0 22px 90px rgba(125,211,252,.12);
-  }
-  .tab.primary::after{display:none}
+/* ===== TAB THEME ===== */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 
-  /* CARDS */
-  .hero{
-    display:grid;
-    grid-template-columns:1.2fr .8fr;
-    gap:14px;
-    margin-top:14px;
-  }
-  .card{
-    border:1px solid rgba(255,255,255,.12);
-    background:var(--card);
-    border-radius:22px;
-    padding:18px;
-    box-shadow:0 28px 110px rgba(0,0,0,.58);
-    backdrop-filter: blur(12px);
-    transform-style:preserve-3d;
-  }
+.tab{
+padding:10px 16px;
+border-radius:12px;
+text-decoration:none;
+color:#d9e0ff;
+font-weight:600;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.12);
+position:relative;
+overflow:hidden;
+transition:.3s;
+}
 
-  /* Reveal animation */
-  .reveal{
-    opacity:0;
-    transform: translateY(28px) scale(.985);
-    transition: opacity .65s cubic-bezier(.17,.67,.29,1),
-                transform .65s cubic-bezier(.17,.67,.29,1);
-    will-change: opacity, transform;
-  }
-  .reveal.show{
-    opacity:1;
-    transform: translateY(0) scale(1);
-  }
+.tab:hover{
+transform:translateY(-2px);
+background:linear-gradient(135deg,#7dd3fc,#c084fc);
+color:black;
+box-shadow:0 15px 50px rgba(124,58,237,.4);
+}
 
-  .h1{margin:0;font-size:46px;line-height:1.02;letter-spacing:-.9px}
-  .grad{
-    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .p{margin:10px 0 0;color:var(--muted);line-height:1.65}
+/* ✅ active tab glow */
+.tab.active{
+background:linear-gradient(135deg,#7dd3fc,#c084fc);
+color:black;
+box-shadow:0 15px 60px rgba(124,58,237,.55);
+border-color:transparent;
+}
+.tab::after{
+content:"";
+position:absolute;
+left:12px; right:12px; bottom:6px;
+height:2px;
+background:linear-gradient(90deg,#7dd3fc,#ff9bd5,#c084fc);
+opacity:0;
+transform:scaleX(.4);
+transition:.25s;
+border-radius:999px;
+}
+.tab.active::after{opacity:1; transform:scaleX(1);}
 
-  .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
-  .pill{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:7px 10px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.03);
-    color:rgba(246,247,255,.85);
-    font-size:12px;
-    user-select:none;
-  }
+/* ===== LAYOUT ===== */
+.wrap{max-width:1100px;margin:auto;padding:20px}
 
-  .ipbox{
-    display:flex; gap:10px; align-items:center; margin-top:12px;
-    padding:12px; border-radius:16px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(0,0,0,.18);
-  }
-  .ip{
-    flex:1;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size:14px;
-    color:rgba(246,247,255,.92);
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  }
-  .mini{
-    padding:9px 11px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.14);
-    background:rgba(255,255,255,.04);
-    color:rgba(246,247,255,.92);
-    cursor:pointer;
-    font-weight:900;
-    transition: transform .15s ease, background .15s ease, border-color .15s ease;
-  }
-  .mini:hover{transform:translateY(-1px); background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.20)}
+.card{
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.1);
+border-radius:20px;
+padding:20px;
+margin-top:20px;
+backdrop-filter:blur(12px);
+transition:.35s ease;
+}
 
-  .btn{
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.03);
-    color:var(--text);
-    padding:10px 14px;
-    border-radius:14px;
-    cursor:pointer;
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center;
-    gap:9px;
-    font-weight:900;
-    font-size:13px;
-    transition: transform .15s ease, background .15s ease, border-color .15s ease;
-    user-select:none;
-  }
-  .btn:hover{transform:translateY(-2px); background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18)}
-  .btn.primary{
-    border:0;
-    color:#0a0d16;
-    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
-    box-shadow:0 22px 90px rgba(192,132,252,.12);
-  }
+.card:hover{
+transform:translateY(-6px);
+box-shadow:0 40px 120px rgba(0,0,0,.7);
+}
 
-  .grid{
-    margin-top:12px;
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
-  }
-  .tile{
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.03);
-    border-radius:18px;
-    padding:14px;
-  }
-  .tile b{display:block;margin-bottom:6px}
-  .small{color:rgba(246,247,255,.62);font-size:13px;line-height:1.55}
+/* ===== HERO ===== */
+h1{font-size:46px;margin:0}
+.grad{
+background:linear-gradient(135deg,#7dd3fc,#c084fc);
+-webkit-background-clip:text;
+color:transparent;
+}
 
-  .sectionTitle{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    margin-bottom:10px;
-  }
-  .sectionTitle h2{margin:0;font-size:15px;letter-spacing:.2px}
-  .hr{height:1px;background:rgba(255,255,255,.10);border-radius:999px;margin:10px 0 0}
+p{opacity:.8}
 
-  .footer{margin-top:22px;text-align:center;color:rgba(246,247,255,.55);font-size:13px}
+/* ===== BUTTON ===== */
+.btn{
+padding:12px 18px;
+border-radius:12px;
+border:0;
+cursor:pointer;
+font-weight:bold;
+margin-top:12px;
+background:linear-gradient(135deg,#7dd3fc,#c084fc);
+color:black;
+transition:.3s;
+text-decoration:none;
+display:inline-block;
+}
+.btn:hover{transform:scale(1.05)}
 
-  @media (max-width:900px){
-    .hero{grid-template-columns:1fr}
-    .h1{font-size:34px}
-    .grid{grid-template-columns:1fr}
-    .brand{min-width:auto}
-  }
-  @media (prefers-reduced-motion: reduce){
-    .reveal{opacity:1; transform:none; transition:none}
-  }
+/* ===== GRID ===== */
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-top:15px;
+}
+
+.tile{
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.1);
+padding:15px;
+border-radius:15px;
+}
+
+/* ===== SCROLL ANIMATION ===== */
+.reveal{
+opacity:0;
+transform:translateY(40px);
+transition:all .8s cubic-bezier(.17,.67,.29,1);
+}
+
+.reveal.show{
+opacity:1;
+transform:translateY(0);
+}
+
+/* ✅ Toast (copy ip pro) */
+#toast{
+position:fixed;
+left:50%;
+bottom:22px;
+transform:translateX(-50%);
+padding:10px 14px;
+border-radius:14px;
+background:rgba(0,0,0,.65);
+border:1px solid rgba(255,255,255,.12);
+backdrop-filter:blur(10px);
+color:#fff;
+font-weight:600;
+opacity:0;
+pointer-events:none;
+transition:opacity .2s ease;
+z-index:99;
+}
+
+@media(max-width:900px){
+.grid{grid-template-columns:1fr}
+h1{font-size:34px}
+}
+
 </style>
 </head>
 
 <body>
+
 <canvas id="bg"></canvas>
-<div class="overlay"></div>
+<div id="toast"></div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="brand">SugarPie</div>
+
+  <div class="tabs">
+    <a class="tab" href="#vibe" data-sec="vibe">Vibe</a>
+    <a class="tab" href="#starter" data-sec="starter">Starter</a>
+    <a class="tab" href="#discord" data-sec="discord">Discord</a>
+    <a class="tab" href="#rules" data-sec="rules">Rules</a>
+  </div>
+</div>
 
 <div class="wrap">
 
-  <!-- NAV -->
-  <div class="nav">
-    <div class="brand">
-      <div class="logo"></div>
-      <div>
-        <div class="title">SugarPie</div>
-        <div class="tag">ultra smooth • cozy grind • clean vibes</div>
-      </div>
-    </div>
+<!-- HERO -->
+<div class="card reveal">
+  <h1>Welcome to <span class="grad">SugarPie</span></h1>
+  <p>Cozy grind, smooth gameplay, clean PvP, weekly events.</p>
+  <button class="btn" onclick="copyIP()">Copy Server IP</button>
+  <a class="btn" href="https://discord.gg/study" target="_blank" rel="noreferrer" style="margin-left:10px">Join Discord</a>
+</div>
 
-    <div class="tabs">
-      <a class="tab" href="#vibe" data-sec="vibe">Vibe</a>
-      <a class="tab" href="#starter" data-sec="starter">Starter</a>
-      <a class="tab" href="#discord" data-sec="discord">Discord</a>
-      <a class="tab" href="#rules" data-sec="rules">Rules</a>
-      <a class="tab primary" href="https://discord.gg/study" target="_blank" rel="noreferrer">Join</a>
-    </div>
+<!-- VIBE -->
+<div class="card reveal" id="vibe">
+  <h2>Server Vibe</h2>
+  <div class="grid">
+    <div class="tile">⚡ Lag free gameplay</div>
+    <div class="tile">🛡️ Fair staff</div>
+    <div class="tile">🎉 Weekly events</div>
   </div>
+</div>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="card reveal tilt">
-      <div class="h1">Welcome to <span class="grad">SugarPie</span></div>
-      <div class="p">
-        Cozy grind + clean PvP. No loud chaos, no toxic spam.
-        Weekly events, balanced economy, and a community that actually replies.
-      </div>
-
-      <div class="ipbox">
-        <div class="ip" id="ipText">play.sugarpie.xyz</div>
-        <button class="mini" id="copyBtn">Copy IP</button>
-      </div>
-
-      <div class="row">
-        <a class="btn primary" href="#starter">⚡ Start in 3 min</a>
-        <a class="btn" href="#discord">💬 Join Discord</a>
-        <a class="btn" href="#rules">🛡️ Rules</a>
-      </div>
-
-      <div class="row" style="margin-top:12px">
-        <span class="pill">⚡ lag-free</span>
-        <span class="pill">🛡️ fair staff</span>
-        <span class="pill">🎉 weekly events</span>
-        <span class="pill">💎 balanced economy</span>
-      </div>
-    </div>
-
-    <div class="card reveal tilt">
-      <div class="sectionTitle">
-        <h2>Server Snapshot</h2>
-        <span class="pill">Java + Bedrock</span>
-      </div>
-      <div class="hr"></div>
-
-      <div class="grid" style="grid-template-columns:1fr">
-        <div class="tile">
-          <b>Why people stay</b>
-          <div class="small">Progress feels rewarding. PvP feels fair. The vibe stays chill.</div>
-        </div>
-        <div class="tile">
-          <b>Version</b>
-          <div class="small">Java: 1.20+ • Bedrock: supported (Geyser)</div>
-        </div>
-        <div class="tile">
-          <b>Support</b>
-          <div class="small">Discord tickets + quick replies. No “seen” and ignore.</div>
-        </div>
-      </div>
-    </div>
+<!-- STARTER -->
+<div class="card reveal" id="starter">
+  <h2>3 Minute Starter</h2>
+  <div class="grid">
+    <div class="tile">Join server</div>
+    <div class="tile">Claim base</div>
+    <div class="tile">Start grinding</div>
   </div>
+</div>
 
-  <!-- VIBE -->
-  <div class="card reveal" id="vibe">
-    <div class="sectionTitle">
-      <h2>What you’ll feel on SugarPie</h2>
-      <span class="pill">🌙 cozy mode</span>
-    </div>
-    <div class="hr"></div>
-
-    <div class="grid">
-      <div class="tile"><b>Calm grind</b><div class="small">Build, trade, explore — without constant drama.</div></div>
-      <div class="tile"><b>Clean fights</b><div class="small">PvP that rewards skill, not dirty tricks.</div></div>
-      <div class="tile"><b>Daily drops</b><div class="small">Small rewards/events so it never feels dead.</div></div>
-    </div>
+<!-- ✅ DISCORD SECTION -->
+<div class="card reveal" id="discord">
+  <h2>Discord Hub</h2>
+  <p style="margin-top:6px">Updates, support, events, and giveaways — all in one place.</p>
+  <div class="grid">
+    <div class="tile">💬 Chat + community</div>
+    <div class="tile">🎁 Giveaways + events</div>
+    <div class="tile">🛠️ Support / reports</div>
   </div>
+  <a class="btn" href="https://discord.gg/study" target="_blank" rel="noreferrer">Join Discord: discord.gg/study</a>
+  <button class="btn" onclick="copyDiscord()" style="margin-left:10px">Copy Invite</button>
+</div>
 
-  <!-- STARTER -->
-  <div class="card reveal" id="starter">
-    <div class="sectionTitle">
-      <h2>3-Minute Starter</h2>
-      <span class="pill">⏱️ fast</span>
-    </div>
-    <div class="hr"></div>
-
-    <div class="grid">
-      <div class="tile"><b>Step 1</b><div class="small">Join Discord → read #start-here → updates & support.</div></div>
-      <div class="tile"><b>Step 2</b><div class="small">Copy IP → join → claim your spot → start base.</div></div>
-      <div class="tile"><b>Step 3</b><div class="small">Vote once → small boosts → easy start (no P2W).</div></div>
-    </div>
+<!-- RULES -->
+<div class="card reveal" id="rules">
+  <h2>Rules</h2>
+  <div class="grid">
+    <div class="tile">No hacks</div>
+    <div class="tile">No toxicity</div>
+    <div class="tile">Respect players</div>
   </div>
+</div>
 
-  <!-- DISCORD SECTION -->
-  <div class="card reveal" id="discord">
-    <div class="sectionTitle">
-      <h2>Discord Hub</h2>
-      <span class="pill">💬 community</span>
-    </div>
-    <div class="hr"></div>
-
-    <div class="grid">
-      <div class="tile">
-        <b>Instant support</b>
-        <div class="small">Tickets, reports, updates — everything in one place.</div>
-      </div>
-      <div class="tile">
-        <b>Events & giveaways</b>
-        <div class="small">Weekly events, rewards, and announcements.</div>
-      </div>
-      <div class="tile">
-        <b>Join in one click</b>
-        <div class="small">Click the button → you’re in. (Invite: study)</div>
-      </div>
-    </div>
-
-    <div class="row" style="margin-top:14px">
-      <a class="btn primary" href="https://discord.gg/study" target="_blank" rel="noreferrer">🚀 Join Discord</a>
-      <button class="btn" id="copyDiscord">📋 Copy Invite</button>
-    </div>
-  </div>
-
-  <!-- RULES -->
-  <div class="card reveal" id="rules">
-    <div class="sectionTitle">
-      <h2>Sweet Rules</h2>
-      <span class="pill">🍬 keep it sweet</span>
-    </div>
-    <div class="hr"></div>
-
-    <div class="grid">
-      <div class="tile"><b>No hacks</b><div class="small">X-ray / clients / exploits = instant action.</div></div>
-      <div class="tile"><b>No toxicity</b><div class="small">Respect players. Don’t ruin vibes.</div></div>
-      <div class="tile"><b>No scams</b><div class="small">Trades must be fair. Zero drama economy.</div></div>
-    </div>
-
-    <div class="small" style="margin-top:12px;opacity:.85">
-      Staff decisions are final • Appeal available on Discord
-    </div>
-  </div>
-
-  <div class="footer">© <span id="y"></span> SugarPie • Not affiliated with Mojang/Microsoft</div>
 </div>
 
 <script>
-  // ===== EDIT THIS IP ONLY =====
-  const SERVER_IP = "play.sugarpie.xyz"; // change to your real IP
-  // ============================
+/* ===== SETTINGS ===== */
+const SERVER_IP = "play.sugarpie.xyz";
+const DISCORD_INVITE = "https://discord.gg/study";
 
-  document.getElementById("y").textContent = new Date().getFullYear();
-  document.getElementById("ipText").textContent = SERVER_IP;
+/* ===== TOAST ===== */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.opacity = "1";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.style.opacity="0", 1200);
+}
 
-  // Toast
-  let toastTimer;
-  function toast(msg){
-    clearTimeout(toastTimer);
-    let el = document.getElementById("toast");
-    if(!el){
-      el = document.createElement("div");
-      el.id = "toast";
-      Object.assign(el.style,{
-        position:"fixed", left:"50%", bottom:"26px",
-        transform:"translateX(-50%)",
-        padding:"10px 14px", borderRadius:"14px",
-        border:"1px solid rgba(255,255,255,.14)",
-        background:"rgba(0,0,0,.58)",
-        backdropFilter:"blur(12px)",
-        color:"rgba(246,247,255,.92)",
-        fontFamily:"inherit", fontSize:"14px",
-        zIndex:"50", opacity:"0", transition:"opacity .15s ease"
-      });
-      document.body.appendChild(el);
-    }
-    el.textContent = msg;
-    el.style.opacity = "1";
-    toastTimer = setTimeout(()=> el.style.opacity="0", 1200);
-  }
+/* ===== COPY IP ===== */
+function copyIP(){
+  navigator.clipboard.writeText(SERVER_IP);
+  showToast("Copied IP: " + SERVER_IP);
+  burst();
+}
+function copyDiscord(){
+  navigator.clipboard.writeText(DISCORD_INVITE);
+  showToast("Copied Discord: " + DISCORD_INVITE);
+  burst();
+}
 
-  // Copy IP
-  document.getElementById("copyBtn").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(SERVER_IP); toast("Copied IP: " + SERVER_IP); burst(); }
-    catch {
-      const t=document.createElement("textarea");
-      t.value=SERVER_IP; document.body.appendChild(t);
-      t.select(); document.execCommand("copy");
-      document.body.removeChild(t);
-      toast("Copied IP: " + SERVER_IP); burst();
+/* ===== SCROLL REVEAL ===== */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting)e.target.classList.add("show");
+  });
+},{threshold:.15});
+document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+
+/* ✅ ACTIVE TAB HIGHLIGHT (scroll pe) */
+const tabs = Array.from(document.querySelectorAll(".tab[data-sec]"));
+const sections = tabs.map(t => document.getElementById(t.dataset.sec)).filter(Boolean);
+
+const tabObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      tabs.forEach(t=>t.classList.remove("active"));
+      const m = tabs.find(t=>t.dataset.sec === e.target.id);
+      if(m) m.classList.add("active");
     }
   });
+},{threshold:0.55});
 
-  // Copy Discord
-  document.getElementById("copyDiscord").addEventListener("click", async () => {
-    const link = "https://discord.gg/study";
-    try { await navigator.clipboard.writeText(link); toast("Copied Discord: " + link); burst(); }
-    catch {
-      const t=document.createElement("textarea");
-      t.value=link; document.body.appendChild(t);
-      t.select(); document.execCommand("copy");
-      document.body.removeChild(t);
-      toast("Copied Discord: " + link); burst();
-    }
+sections.forEach(s=>tabObserver.observe(s));
+if(tabs[0]) tabs[0].classList.add("active");
+
+/* ✅ CLICK SPARK BURST (more insane) */
+let lastMouse={x:innerWidth/2,y:innerHeight/2};
+window.addEventListener("mousemove",(e)=>{lastMouse.x=e.clientX;lastMouse.y=e.clientY;},{passive:true});
+
+function burst(){
+  const n=12;
+  for(let i=0;i<n;i++){
+    const s=document.createElement("div");
+    const size=4+Math.random()*6;
+    const a=Math.random()*Math.PI*2;
+    const d=26+Math.random()*52;
+    const x=lastMouse.x+Math.cos(a)*d;
+    const y=lastMouse.y+Math.sin(a)*d;
+
+    s.style.position="fixed";
+    s.style.left=(lastMouse.x-size/2)+"px";
+    s.style.top=(lastMouse.y-size/2)+"px";
+    s.style.width=size+"px";
+    s.style.height=size+"px";
+    s.style.borderRadius="999px";
+    s.style.pointerEvents="none";
+    s.style.zIndex="80";
+    s.style.background="linear-gradient(135deg,#7dd3fc,#ff9bd5,#c084fc)";
+    s.style.opacity="1";
+    s.style.transform="translate(0,0) scale(1)";
+    s.style.transition="transform .55s ease, opacity .55s ease, filter .55s ease";
+    document.body.appendChild(s);
+
+    requestAnimationFrame(()=>{
+      s.style.transform=`translate(${x-lastMouse.x}px,${y-lastMouse.y}px) scale(.4)`;
+      s.style.opacity="0";
+      s.style.filter="blur(2px)";
+    });
+    setTimeout(()=>s.remove(),600);
+  }
+}
+
+/* ===== 4D DOT BACKGROUND ===== */
+const c=document.getElementById("bg");
+const ctx=c.getContext("2d");
+
+function resize(){ c.width=innerWidth; c.height=innerHeight; }
+resize();
+window.onresize=resize;
+
+let mouse={x:0,y:0};
+window.onmousemove=e=>{ mouse.x=e.clientX; mouse.y=e.clientY; };
+
+let dots=[];
+for(let i=0;i<240;i++){
+  dots.push({
+    x:Math.random()*innerWidth,
+    y:Math.random()*innerHeight,
+    z:Math.random()+.5,
+    hue: Math.random()*360
+  });
+}
+
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+
+  dots.forEach(d=>{
+    let dx=d.x-mouse.x;
+    let dy=d.y-mouse.y;
+    let dist=Math.sqrt(dx*dx+dy*dy);
+    let lift=Math.max(0,1-dist/220);
+
+    const r=d.z*2+lift*5;
+
+    ctx.beginPath();
+    ctx.arc(d.x,d.y,r,0,Math.PI*2);
+
+    // little color glow (insane)
+    ctx.fillStyle=`hsla(${d.hue},90%,70%,${0.15+d.z*0.35+lift*0.25})`;
+    ctx.fill();
+
+    d.x+=Math.sin(d.z)*.28;
+    d.y+=Math.cos(d.z)*.28;
+
+    if(d.x>innerWidth)d.x=0;
+    if(d.y>innerHeight)d.y=0;
+    if(d.x<0)d.x=innerWidth;
+    if(d.y<0)d.y=innerHeight;
   });
 
-  // Reveal on scroll
-  const reveals = document.querySelectorAll(".reveal");
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting) e.target.classList.add("show");
-    });
-  },{threshold:.12});
-  reveals.forEach(el=>io.observe(el));
-
-  // Active tab highlight
-  const tabs = Array.from(document.querySelectorAll(".tab[data-sec]"));
-  const sections = tabs.map(t => document.getElementById(t.dataset.sec)).filter(Boolean);
-  const sio = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        tabs.forEach(t=>t.classList.remove("active"));
-        const match = tabs.find(t=>t.dataset.sec === e.target.id);
-        if(match) match.classList.add("active");
-      }
-    });
-  },{threshold:0.55});
-  sections.forEach(s=>sio.observe(s));
-  // default active
-  const first = tabs[0]; if(first) first.classList.add("active");
-
-  // 3D tilt on cards
-  function addTilt(el){
-    const strength = 10;
-    el.addEventListener("mousemove",(ev)=>{
-      const r = el.getBoundingClientRect();
-      const px = (ev.clientX - r.left)/r.width - 0.5;
-      const py = (ev.clientY - r.top)/r.height - 0.5;
-      el.style.transform = `rotateY(${px*strength}deg) rotateX(${(-py)*strength}deg) translateZ(0)`;
-    });
-    el.addEventListener("mouseleave",()=>{ el.style.transform = "rotateY(0deg) rotateX(0deg)"; });
-  }
-  document.querySelectorAll(".tilt").forEach(addTilt);
-
-  // ===== INSANE Spark burst (click vibe) =====
-  let lastMouse = {x: innerWidth/2, y: innerHeight/2};
-  window.addEventListener("mousemove",(e)=>{ lastMouse.x=e.clientX; lastMouse.y=e.clientY; }, {passive:true});
-
-  function burst(){
-    const n = 14;
-    for(let i=0;i<n;i++){
-      const s = document.createElement("div");
-      const size = 4 + Math.random()*6;
-      const angle = Math.random()*Math.PI*2;
-      const dist = 30 + Math.random()*50;
-      const x = lastMouse.x + Math.cos(angle)*dist;
-      const y = lastMouse.y + Math.sin(angle)*dist;
-
-      s.style.position="fixed";
-      s.style.left = (lastMouse.x - size/2) + "px";
-      s.style.top  = (lastMouse.y - size/2) + "px";
-      s.style.width = size + "px";
-      s.style.height = size + "px";
-      s.style.borderRadius="999px";
-      s.style.pointerEvents="none";
-      s.style.zIndex="60";
-      s.style.background = "linear-gradient(135deg, rgba(125,211,252,.9), rgba(255,155,213,.9), rgba(192,132,252,.9))";
-      s.style.filter = "blur(0px)";
-      s.style.opacity="1";
-      s.style.transform="translate(0,0) scale(1)";
-      s.style.transition="transform .55s ease, opacity .55s ease, filter .55s ease";
-      document.body.appendChild(s);
-
-      requestAnimationFrame(()=>{
-        s.style.transform = `translate(${x-lastMouse.x}px, ${y-lastMouse.y}px) scale(0.4)`;
-        s.style.opacity="0";
-        s.style.filter="blur(2px)";
-      });
-      setTimeout(()=>s.remove(), 600);
-    }
-  }
-
-  // ===== 4D Sugar Dust background =====
-  const canvas = document.getElementById("bg");
-  const ctx = canvas.getContext("2d", { alpha:true });
-
-  let W,H,DPR;
-  function resize(){
-    DPR = Math.min(2, window.devicePixelRatio || 1);
-    W = canvas.width = Math.floor(innerWidth * DPR);
-    H = canvas.height = Math.floor(innerHeight * DPR);
-    canvas.style.width = innerWidth + "px";
-    canvas.style.height = innerHeight + "px";
-  }
-  window.addEventListener("resize", resize, {passive:true});
-  resize();
-
-  const mouse = { x: innerWidth/2, y: innerHeight/2, vx:0, vy:0 };
-  window.addEventListener("mousemove",(e)=>{
-    mouse.vx = e.clientX - mouse.x;
-    mouse.vy = e.clientY - mouse.y;
-    mouse.x = e.clientX; mouse.y = e.clientY;
-  }, {passive:true});
-
-  const rand=(a,b)=>a+Math.random()*(b-a);
-  const COLORS = [
-    [125,211,252],   // blue
-    [255,155,213],   // pink
-    [192,132,252],   // purple
-    [255,255,255]    // white
-  ];
-
-  const COUNT = 260;
-  const p = [];
-  for(let i=0;i<COUNT;i++){
-    const col = COLORS[Math.floor(Math.random()*COLORS.length)];
-    p.push({
-      x: rand(0, innerWidth),
-      y: rand(0, innerHeight),
-      z: rand(0.25, 1.10),
-      r: rand(0.6, 1.7),
-      sx: rand(-0.14, 0.14),
-      sy: rand(-0.12, 0.12),
-      phase: rand(0, Math.PI*2),
-      cr: col[0], cg: col[1], cb: col[2]
-    });
-  }
-
-  function frame(t){
-    ctx.clearRect(0,0,W,H);
-    const mx = mouse.x * DPR, my = mouse.y * DPR;
-
-    for(let i=0;i<COUNT;i++){
-      const d = p[i];
-
-      d.x += d.sx * (0.6 + d.z);
-      d.y += d.sy * (0.6 + d.z);
-
-      const wob = Math.sin(t*0.0016 + d.phase) * (0.35 + 0.9*d.z);
-      d.x += wob * 0.05;
-      d.y += Math.cos(t*0.0012 + d.phase) * 0.03;
-
-      if(d.x < -30) d.x = innerWidth + 30;
-      if(d.x > innerWidth + 30) d.x = -30;
-      if(d.y < -30) d.y = innerHeight + 30;
-      if(d.y > innerHeight + 30) d.y = -30;
-
-      const dx = d.x - mouse.x, dy = d.y - mouse.y;
-      const dist = Math.hypot(dx,dy);
-      const infl = Math.max(0, 1 - dist/240);
-      const z = d.z + infl * 0.70;
-      const par = (z - 0.25) * 18;
-
-      const px = d.x * DPR;
-      const py = d.y * DPR;
-
-      const sx = px + ((px - mx)/(240*DPR))*par + (mouse.vx*0.02*infl)*DPR;
-      const sy = py + ((py - my)/(240*DPR))*par + (mouse.vy*0.02*infl)*DPR;
-
-      const radius = (d.r + infl*2.4) * DPR * (0.75 + z);
-      const alpha = 0.16 + 0.55*z + infl*0.25;
-
-      // glow
-      ctx.beginPath();
-      ctx.arc(sx, sy, radius*2.2, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${d.cr},${d.cg},${d.cb},${Math.min(0.16, alpha*0.12)})`;
-      ctx.fill();
-
-      // core
-      ctx.beginPath();
-      ctx.arc(sx, sy, radius, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${d.cr},${d.cg},${d.cb},${Math.min(0.92, alpha)})`;
-      ctx.fill();
-    }
-
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
+  requestAnimationFrame(draw);
+}
+draw();
 </script>
 
 </body>
