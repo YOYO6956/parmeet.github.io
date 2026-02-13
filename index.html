@@ -7,10 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
+        /* BASE RESET */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
         body {
-            background-color: #05010a; /* Deep dark purple/black */
+            background-color: #020005; /* Deep Space Black */
             color: #fff;
             overflow-x: hidden;
             overflow-y: auto;
@@ -22,8 +23,8 @@
             user-select: none; 
         }
 
-        /* Matrix Rain Canvas */
-        #matrix-canvas {
+        /* HYPERSPACE CANVAS */
+        #warp-canvas {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -31,20 +32,62 @@
             cursor: crosshair;
         }
 
-        /* Floating Glass Container */
+        /* LIVE PLAYER COUNTER */
+        .player-counter {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            background: rgba(15, 5, 25, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 0, 127, 0.4);
+            border-radius: 50px;
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 0, 127, 0.2);
+            z-index: 100;
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .player-counter:hover {
+            transform: scale(1.05) translateY(-2px);
+            border-color: #ff6b6b;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            animation: pulseDot 1.5s infinite alternate;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(1); opacity: 0.7; }
+            100% { transform: scale(1.3); opacity: 1; }
+        }
+
+        /* MAIN CONTAINER */
         .glass-wrapper {
             position: relative;
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 50px 20px;
-            pointer-events: none; /* Let mouse clicks pass through to the canvas */
+            padding: 100px 20px 50px 20px;
+            pointer-events: none; 
             width: 100%;
             max-width: 1300px;
         }
 
-        /* Main Glowing Title */
+        /* GLOWING TITLE */
         h1 {
             font-size: 5.5rem;
             font-weight: 900;
@@ -64,26 +107,27 @@
             text-transform: uppercase;
         }
 
-        /* Click Indicator Text */
+        /* WARP HINT */
         .hint-text {
-            color: rgba(255, 142, 139, 0.8);
+            color: rgba(255, 255, 255, 0.6);
             font-size: 0.95rem;
             letter-spacing: 2px;
             margin-bottom: 25px;
             animation: pulseHint 2s infinite;
-            background: rgba(255, 0, 127, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             padding: 8px 15px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 0, 127, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
         }
 
-        /* 3D Interactive Cards Grid */
+        /* CARDS GRID */
         .grid {
             display: flex;
             gap: 30px;
             justify-content: center;
             flex-wrap: wrap;
-            pointer-events: auto; /* Re-enable clicks inside the cards */
+            pointer-events: auto; 
             width: 100%;
         }
 
@@ -103,20 +147,6 @@
             flex-direction: column;
         }
 
-        /* The Card Hover Glow Effect */
-        .card::before {
-            content: "";
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255, 0, 127, 0.2) 10%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.4s;
-            pointer-events: none;
-        }
-
-        .card:hover::before { opacity: 1; }
-
         .card:hover {
             transform: translateY(-10px) scale(1.02);
             border-color: rgba(255, 0, 127, 0.6);
@@ -131,20 +161,41 @@
             padding-bottom: 15px;
         }
 
-        /* Server IP Styling */
+        /* --- IP WAVE EFFECT --- */
         .ip-display {
             background: rgba(0,0,0,0.8);
             padding: 15px;
             border-radius: 12px;
             font-family: monospace;
-            font-size: 1.3rem;
-            color: #ff8e8b;
-            border: 1px dashed rgba(255, 142, 139, 0.5);
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffffff; /* White by default */
+            border: 1px dashed rgba(255, 255, 255, 0.3);
             margin-bottom: auto;
             margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        /* Stylish Rules List */
+        /* Hover: Wave Animation */
+        .ip-display:hover {
+            border-color: #ff007f;
+            transform: scale(1.05);
+            background: linear-gradient(to right, #ffffff 0%, #ff007f 20%, #ff8e8b 40%, #ffffff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            animation: shine 2s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+        /* --------------------- */
+
         .rules-list {
             text-align: left;
             list-style: none;
@@ -158,7 +209,6 @@
             font-size: 1.1rem;
             color: #d1b3ff;
             transition: transform 0.3s ease, color 0.3s ease;
-            cursor: default;
         }
 
         .rules-list li:hover {
@@ -166,7 +216,6 @@
             color: #fff;
         }
 
-        /* Glowing Neon Bullets */
         .rules-list li::before {
             content: '';
             position: absolute;
@@ -179,7 +228,6 @@
             box-shadow: 0 0 10px #ff007f, 0 0 20px #ff8e8b;
         }
 
-        /* Buttons */
         .btn {
             display: inline-block;
             width: 100%;
@@ -228,11 +276,10 @@
         }
 
         @keyframes pulseHint {
-            0%, 100% { opacity: 0.5; box-shadow: 0 0 5px rgba(255,0,127,0); }
-            50% { opacity: 1; box-shadow: 0 0 15px rgba(255,0,127,0.5); }
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
-        /* Balloon CSS */
         .balloon {
             position: fixed;
             bottom: -150px;
@@ -253,17 +300,30 @@
             0% { transform: translateY(0) rotate(0deg); opacity: 1; }
             100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
         }
+
+        @media (max-width: 768px) {
+            .player-counter {
+                top: 15px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+        }
     </style>
 </head>
 <body>
 
-    <canvas id="matrix-canvas"></canvas>
+    <canvas id="warp-canvas"></canvas>
+
+    <div class="player-counter">
+        <div class="live-dot" id="status-dot"></div>
+        <div id="player-count">Pinging Server...</div>
+    </div>
 
     <div class="glass-wrapper">
         <h1>SugarPie</h1>
         <div class="subtitle">Next-Gen Survival Experience</div>
         
-        <div class="hint-text">CLICK BACKGROUND FOR SHOCKWAVE 💥</div>
+        <div class="hint-text">[ CLICK AND HOLD FOR WARP SPEED ]</div>
 
         <div class="grid">
             <div class="card" id="mc-card">
@@ -291,7 +351,7 @@
                 <p style="color: #aaa; line-height: 1.5;">
                     Join our massive community! Click below to instantly launch the Discord App and get chatting.
                 </p>
-                <a href="https://discord.gg/YOUR_CODE_HERE" target="_blank" class="btn btn-discord" style="margin-top: auto;">
+                <a href="https://discord.gg/ZmCVr8c6sf" target="_blank" class="btn btn-discord" style="margin-top: auto;">
                     Launch Discord
                 </a>
             </div>
@@ -299,121 +359,110 @@
     </div>
 
     <script>
-        // --- 1. Custom 3D Matrix "Sugar Rain" Engine ---
-        const canvas = document.getElementById('matrix-canvas');
+        // --- 0. LIVE PLAYER COUNTER ---
+        const serverIP = "play.sugarpie.net"; 
+
+        async function updatePlayerCount() {
+            try {
+                const response = await fetch(`https://api.mcsrvstat.us/2/${serverIP}`);
+                const data = await response.json();
+                const countText = document.getElementById("player-count");
+                const statusDot = document.getElementById("status-dot");
+
+                if (data.online) {
+                    countText.innerText = `${data.players.online} Players Online`;
+                    statusDot.style.backgroundColor = "#00ff88";
+                    statusDot.style.boxShadow = "0 0 10px #00ff88, 0 0 20px #00ff88";
+                } else {
+                    countText.innerText = "Server Offline";
+                    statusDot.style.backgroundColor = "#ff0033";
+                    statusDot.style.boxShadow = "0 0 10px #ff0033, 0 0 20px #ff0033";
+                }
+            } catch (error) {
+                document.getElementById("player-count").innerText = "Stats Unavailable";
+            }
+        }
+        updatePlayerCount();
+        setInterval(updatePlayerCount, 60000);
+
+        // --- 1. HYPERSPACE WARP ENGINE ---
+        const canvas = document.getElementById('warp-canvas');
         const ctx = canvas.getContext('2d');
         
-        let width, height;
-        let drops = [];
-        const numDrops = 200; // Amount of falling symbols
+        let width, height, stars = [];
+        const numStars = 1000;
+        let speed = 2;        // Normal cruise
+        let warpSpeed = 50;   // WARP speed
+        let targetSpeed = speed;
+        let currentSpeed = speed;
 
-        // SugarPie Theme Characters (Swords, Hearts, Stars, Cubes, Diamonds)
-        const chars = ['♥', '✦', '⚔', '⛏', '🍬', '⬟', '❖', '❄'];
-        const colors = ['#ff007f', '#ff8e8b', '#ffffff', '#d1b3ff'];
+        const starColors = ['#ff007f', '#ff8e8b', '#ffffff', '#d1b3ff'];
 
         function initCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            drops = [];
-            for (let i = 0; i < numDrops; i++) {
-                drops.push(new Drop());
+            stars = [];
+            for (let i = 0; i < numStars; i++) {
+                stars.push(new Star());
             }
         }
 
-        class Drop {
-            constructor() {
-                this.reset(true);
-            }
-            reset(randomY = false) {
-                // z represents depth (0.1 is far back, 1.5 is right in your face)
-                this.z = Math.random() * 1.2 + 0.3; 
-                this.x = Math.random() * width;
-                this.y = randomY ? Math.random() * height : -50;
-                this.speed = (Math.random() * 3 + 2) * this.z; // Closer drops fall faster
-                this.size = 14 * this.z; // Closer drops are bigger
-                this.char = chars[Math.floor(Math.random() * chars.length)];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Physics velocity (modified by shockwave)
-                this.vx = 0;
-                this.vy = this.speed;
+        class Star {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = (Math.random() - 0.5) * width * 2;
+                this.y = (Math.random() - 0.5) * height * 2;
+                this.z = Math.random() * width;
+                this.pz = this.z;
+                this.color = starColors[Math.floor(Math.random() * starColors.length)];
             }
             update() {
-                // Apply velocity
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Friction to slowly stop the shockwave horizontal movement
-                this.vx *= 0.95;
-                
-                // Return to normal falling speed smoothly after shockwave
-                this.vy += (this.speed - this.vy) * 0.05;
-
-                // Reset when it falls off screen
-                if (this.y > height + 50) {
-                    this.reset(false);
+                this.z -= currentSpeed;
+                if (this.z <= 0) {
+                    this.reset();
+                    this.pz = this.z; 
                 }
-                // Wrap around sides if blasted off screen
-                if (this.x > width + 50) this.x = -50;
-                if (this.x < -50) this.x = width + 50;
             }
             draw() {
-                // Opacity is based on depth (z) to create the 3D illusion
-                ctx.globalAlpha = this.z / 1.5; 
-                ctx.font = `bold ${this.size}px Outfit`;
-                ctx.fillStyle = this.color;
-                // Add a glow effect to closer objects
-                if (this.z > 1) {
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = this.color;
-                } else {
-                    ctx.shadowBlur = 0;
-                }
-                ctx.fillText(this.char, this.x, this.y);
-                ctx.globalAlpha = 1; // Reset
+                let fov = width;
+                let sx = (this.x / this.z) * fov + width / 2;
+                let sy = (this.y / this.z) * fov + height / 2;
+                
+                let px = (this.x / this.pz) * fov + width / 2;
+                let py = (this.y / this.pz) * fov + height / 2;
+
+                this.pz = this.z;
+
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+                ctx.lineTo(sx, sy);
+                
+                let thickness = (1 - this.z / width) * 2;
+                ctx.lineWidth = Math.max(thickness, 0.2);
+                ctx.strokeStyle = this.color;
+                ctx.stroke();
             }
         }
 
-        function animateMatrix() {
-            // The magic trick: Fill background with slightly transparent black.
-            // This leaves a "trail" behind the falling symbols!
-            ctx.fillStyle = 'rgba(5, 1, 10, 0.25)';
+        function animateWarp() {
+            currentSpeed += (targetSpeed - currentSpeed) * 0.05;
+            ctx.fillStyle = 'rgba(2, 0, 5, 0.4)';
             ctx.fillRect(0, 0, width, height);
-            
-            for (let i = 0; i < drops.length; i++) {
-                drops[i].update();
-                drops[i].draw();
+            for (let i = 0; i < stars.length; i++) {
+                stars[i].update();
+                stars[i].draw();
             }
-            requestAnimationFrame(animateMatrix);
+            requestAnimationFrame(animateWarp);
         }
 
-        // --- The Shockwave Click Event ---
-        window.addEventListener('click', (e) => {
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
-            const blastRadius = 300;
-            const forceMultiplier = 25;
-
-            drops.forEach(drop => {
-                const dx = drop.x - mouseX;
-                const dy = drop.y - mouseY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                // If drop is near the click, BLAST it outwards
-                if (distance < blastRadius) {
-                    // Push strength depends on how close it is to the center
-                    const push = (blastRadius - distance) / blastRadius;
-                    drop.vx = (dx / distance) * push * forceMultiplier;
-                    drop.vy = (dy / distance) * push * forceMultiplier;
-                }
-            });
-        });
-
+        window.addEventListener('mousedown', () => targetSpeed = warpSpeed);
+        window.addEventListener('mouseup', () => targetSpeed = speed);
+        window.addEventListener('touchstart', () => targetSpeed = warpSpeed);
+        window.addEventListener('touchend', () => targetSpeed = speed);
         window.addEventListener('resize', initCanvas);
 
-        // Start Engine
         initCanvas();
-        animateMatrix();
+        animateWarp();
 
         // --- 2. 3D Card Tracking ---
         const cards = document.querySelectorAll('.card');
@@ -426,10 +475,8 @@
                 const centerY = rect.height / 2;
                 const rotateX = ((y - centerY) / centerY) * -10; 
                 const rotateY = ((x - centerX) / centerX) * 10;
-                
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
             });
-
             card.addEventListener('mouseleave', () => {
                 card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
             });
@@ -444,9 +491,8 @@
             setTimeout(() => btn.innerText = "Copy IP Address", 2000);
         }
 
-        // --- 4. The 2-Minute Balloon Drop ---
+        // --- 4. 2-Minute Balloon Drop ---
         const balloonColors = ['#ff007f', '#ff8e8b', '#ffffff', '#4752C4'];
-
         function releaseBalloons() {
             for(let i = 0; i < 20; i++) {
                 setTimeout(() => {
@@ -461,11 +507,8 @@
                 }, i * 300);
             }
         }
-
-        // Fire instantly on load, then strictly every 2 mins (120,000ms)
         releaseBalloons();
         setInterval(releaseBalloons, 120000);
-
     </script>
 </body>
 </html>
