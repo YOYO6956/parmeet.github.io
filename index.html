@@ -1,274 +1,440 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SugarPie</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SugarPie • Minecraft Server</title>
+<meta name="description" content="SugarPie — a neon-smooth Minecraft hub. Join Discord, copy IP, and play." />
 
 <style>
+  :root{
+    --bg:#04050a;
+    --text:#f6f7ff;
+    --muted:rgba(246,247,255,.70);
+    --glass:rgba(255,255,255,.06);
+    --stroke:rgba(255,255,255,.12);
+    --a:#7dd3fc;   /* blue */
+    --b:#c084fc;   /* purple */
+    --c:#ff9bd5;   /* pink */
+    --d:#4ade80;   /* green */
+  }
 
-/* ===== GLOBAL ===== */
-html{scroll-behavior:smooth;}
-body{
-margin:0;
-background:#05060a;
-color:white;
-font-family:system-ui;
-overflow-x:hidden;
-}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    overflow-x:hidden;
+  }
 
-canvas{
-position:fixed;
-top:0;left:0;
-z-index:-1;
-}
+  /* ===== INSANE BACKGROUND LAYERS ===== */
+  #fx{position:fixed; inset:0; width:100%; height:100%; z-index:-3; display:block;}
+  .aurora{
+    position:fixed; inset:-40px; z-index:-2; pointer-events:none;
+    background:
+      radial-gradient(900px 700px at 10% 20%, rgba(125,211,252,.18), transparent 60%),
+      radial-gradient(900px 700px at 90% 20%, rgba(255,155,213,.16), transparent 60%),
+      radial-gradient(900px 700px at 55% 115%, rgba(192,132,252,.18), transparent 60%),
+      radial-gradient(900px 700px at 50% 40%, rgba(74,222,128,.07), transparent 55%),
+      radial-gradient(1200px 900px at 50% 50%, transparent 35%, rgba(0,0,0,.70) 100%);
+    filter:saturate(1.25);
+  }
+  .scanlines{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.03) 0px,
+      rgba(255,255,255,.03) 1px,
+      transparent 2px,
+      transparent 6px
+    );
+    mix-blend-mode: overlay;
+    opacity:.22;
+  }
 
-/* ===== NAVBAR ===== */
-.nav{
-position:sticky;
-top:10px;
-margin:20px auto;
-max-width:1100px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:14px 18px;
-border-radius:18px;
-background:rgba(0,0,0,.4);
-border:1px solid rgba(255,255,255,.1);
-backdrop-filter:blur(15px);
-box-shadow:0 30px 100px rgba(0,0,0,.6);
-}
+  /* Cursor glow */
+  .cursorGlow{
+    position:fixed; width:24px; height:24px; border-radius:999px;
+    left:0; top:0; transform:translate(-50%,-50%);
+    pointer-events:none; z-index:50;
+    background:radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,0) 60%);
+    filter: blur(0px);
+    opacity:.0;
+    transition:opacity .2s ease;
+  }
 
-.brand{
-font-size:20px;
-font-weight:800;
-background:linear-gradient(90deg,#7dd3fc,#c084fc);
--webkit-background-clip:text;
-color:transparent;
-}
+  /* ===== LAYOUT ===== */
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 18px 90px}
 
-/* ===== TAB THEME ===== */
-.tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  /* INSANE header */
+  .topbar{
+    position:sticky; top:12px; z-index:10;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:12px 12px;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.40);
+    backdrop-filter: blur(16px);
+    box-shadow:0 28px 110px rgba(0,0,0,.62);
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+    min-width:220px;
+  }
+  .logo{
+    width:44px;height:44px;border-radius:18px;
+    background:conic-gradient(from 180deg, var(--a), var(--c), var(--b), var(--d), var(--a));
+    box-shadow:0 22px 90px rgba(255,155,213,.12);
+  }
+  .brand .name{
+    font-weight:1000; letter-spacing:.2px; line-height:1.05;
+    font-size:15px;
+  }
+  .brand .sub{
+    color:rgba(246,247,255,.60);
+    font-size:12px;
+    margin-top:3px;
+  }
 
-.tab{
-padding:10px 16px;
-border-radius:12px;
-text-decoration:none;
-color:#d9e0ff;
-font-weight:600;
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.12);
-position:relative;
-overflow:hidden;
-transition:.3s;
-}
+  .tabs{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+  .tab{
+    position:relative;
+    padding:10px 14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.03);
+    color:rgba(246,247,255,.92);
+    text-decoration:none;
+    font-weight:900;
+    font-size:13px;
+    user-select:none;
+    transition:transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
+    overflow:hidden;
+  }
+  .tab:hover{
+    transform:translateY(-2px);
+    background:rgba(255,255,255,.06);
+    border-color:rgba(255,255,255,.18);
+  }
+  .tab.active{
+    background:linear-gradient(135deg, rgba(125,211,252,.18), rgba(255,155,213,.14), rgba(192,132,252,.16));
+    border-color:rgba(255,255,255,.18);
+  }
+  .tab::after{
+    content:"";
+    position:absolute; left:12px; right:12px; bottom:8px;
+    height:2px; border-radius:999px;
+    background:linear-gradient(90deg,var(--a),var(--c),var(--b),var(--d));
+    opacity:0; transform:scaleX(.4);
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .tab.active::after{opacity:1; transform:scaleX(1)}
+  .tab.primary{
+    border:0;
+    color:#0a0d16;
+    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
+    box-shadow:0 20px 90px rgba(125,211,252,.14);
+  }
+  .tab.primary::after{display:none}
 
-.tab:hover{
-transform:translateY(-2px);
-background:linear-gradient(135deg,#7dd3fc,#c084fc);
-color:black;
-box-shadow:0 15px 50px rgba(124,58,237,.4);
-}
+  /* Sections */
+  .hero{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:1.25fr .75fr;
+    gap:14px;
+    align-items:stretch;
+  }
 
-/* ✅ active tab glow */
-.tab.active{
-background:linear-gradient(135deg,#7dd3fc,#c084fc);
-color:black;
-box-shadow:0 15px 60px rgba(124,58,237,.55);
-border-color:transparent;
-}
-.tab::after{
-content:"";
-position:absolute;
-left:12px; right:12px; bottom:6px;
-height:2px;
-background:linear-gradient(90deg,#7dd3fc,#ff9bd5,#c084fc);
-opacity:0;
-transform:scaleX(.4);
-transition:.25s;
-border-radius:999px;
-}
-.tab.active::after{opacity:1; transform:scaleX(1);}
+  .card{
+    border:1px solid rgba(255,255,255,.12);
+    background:var(--glass);
+    border-radius:26px;
+    padding:18px;
+    backdrop-filter: blur(14px);
+    box-shadow:0 30px 130px rgba(0,0,0,.58);
+    transform-style:preserve-3d;
+  }
 
-/* ===== LAYOUT ===== */
-.wrap{max-width:1100px;margin:auto;padding:20px}
+  .reveal{
+    opacity:0;
+    transform:translateY(26px) scale(.985);
+    transition:opacity .75s cubic-bezier(.16,.75,.25,1),
+               transform .75s cubic-bezier(.16,.75,.25,1);
+    will-change:opacity, transform;
+  }
+  .reveal.show{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
 
-.card{
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,255,255,.1);
-border-radius:20px;
-padding:20px;
-margin-top:20px;
-backdrop-filter:blur(12px);
-transition:.35s ease;
-}
+  .title{
+    margin:0;
+    font-size:52px;
+    line-height:1.0;
+    letter-spacing:-1px;
+  }
+  .grad{
+    background:linear-gradient(135deg,var(--a),var(--c),var(--b),var(--d));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .desc{margin:10px 0 0; color:var(--muted); line-height:1.65}
 
-.card:hover{
-transform:translateY(-6px);
-box-shadow:0 40px 120px rgba(0,0,0,.7);
-}
+  .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.03);
+    color:rgba(246,247,255,.85);
+    font-size:12px;
+    user-select:none;
+  }
 
-/* ===== HERO ===== */
-h1{font-size:46px;margin:0}
-.grad{
-background:linear-gradient(135deg,#7dd3fc,#c084fc);
--webkit-background-clip:text;
-color:transparent;
-}
+  .ipbox{
+    display:flex; gap:10px; align-items:center;
+    padding:12px; border-radius:18px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.18);
+    margin-top:12px;
+  }
+  .ip{
+    flex:1;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    font-size:14px;
+    color:rgba(246,247,255,.92);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
 
-p{opacity:.8}
+  .btn{
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.03);
+    color:var(--text);
+    padding:10px 14px;
+    border-radius:16px;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center; gap:9px;
+    font-weight:950;
+    font-size:13px;
+    user-select:none;
+    transition:transform .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px); background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18)}
+  .btn.primary{
+    border:0;
+    color:#0a0d16;
+    background:linear-gradient(135deg,var(--a),var(--c),var(--b));
+    box-shadow:0 18px 90px rgba(255,155,213,.12);
+  }
 
-/* ===== BUTTON ===== */
-.btn{
-padding:12px 18px;
-border-radius:12px;
-border:0;
-cursor:pointer;
-font-weight:bold;
-margin-top:12px;
-background:linear-gradient(135deg,#7dd3fc,#c084fc);
-color:black;
-transition:.3s;
-text-decoration:none;
-display:inline-block;
-}
-.btn:hover{transform:scale(1.05)}
+  .grid{
+    margin-top:12px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  .tile{
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.03);
+    border-radius:20px;
+    padding:14px;
+  }
+  .tile b{display:block;margin-bottom:6px}
+  .small{color:rgba(246,247,255,.62);font-size:13px;line-height:1.55}
 
-/* ===== GRID ===== */
-.grid{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px;
-margin-top:15px;
-}
+  .sectionTitle{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    margin-bottom:10px;
+  }
+  .sectionTitle h2{margin:0;font-size:15px;letter-spacing:.2px}
+  .hr{height:1px;background:rgba(255,255,255,.10);border-radius:999px;margin:10px 0 0}
 
-.tile{
-background:rgba(255,255,255,.04);
-border:1px solid rgba(255,255,255,.1);
-padding:15px;
-border-radius:15px;
-}
+  .footer{
+    margin-top:26px;
+    text-align:center;
+    color:rgba(246,247,255,.55);
+    font-size:13px;
+  }
 
-/* ===== SCROLL ANIMATION ===== */
-.reveal{
-opacity:0;
-transform:translateY(40px);
-transition:all .8s cubic-bezier(.17,.67,.29,1);
-}
+  /* Toast */
+  #toast{
+    position:fixed; left:50%; bottom:22px;
+    transform:translateX(-50%);
+    padding:10px 14px;
+    border-radius:14px;
+    background:rgba(0,0,0,.62);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(10px);
+    color:#fff;
+    font-weight:700;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease;
+    z-index:99;
+  }
 
-.reveal.show{
-opacity:1;
-transform:translateY(0);
-}
-
-/* ✅ Toast (copy ip pro) */
-#toast{
-position:fixed;
-left:50%;
-bottom:22px;
-transform:translateX(-50%);
-padding:10px 14px;
-border-radius:14px;
-background:rgba(0,0,0,.65);
-border:1px solid rgba(255,255,255,.12);
-backdrop-filter:blur(10px);
-color:#fff;
-font-weight:600;
-opacity:0;
-pointer-events:none;
-transition:opacity .2s ease;
-z-index:99;
-}
-
-@media(max-width:900px){
-.grid{grid-template-columns:1fr}
-h1{font-size:34px}
-}
-
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr}
+    .title{font-size:38px}
+    .grid{grid-template-columns:1fr}
+    .brand{min-width:auto}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1; transform:none; transition:none}
+    .cursorGlow{display:none}
+  }
 </style>
 </head>
 
 <body>
-
-<canvas id="bg"></canvas>
+<canvas id="fx"></canvas>
+<div class="aurora"></div>
+<div class="scanlines"></div>
+<div class="cursorGlow" id="cursorGlow"></div>
 <div id="toast"></div>
-
-<!-- NAV -->
-<div class="nav">
-  <div class="brand">SugarPie</div>
-
-  <div class="tabs">
-    <a class="tab" href="#vibe" data-sec="vibe">Vibe</a>
-    <a class="tab" href="#starter" data-sec="starter">Starter</a>
-    <a class="tab" href="#discord" data-sec="discord">Discord</a>
-    <a class="tab" href="#rules" data-sec="rules">Rules</a>
-  </div>
-</div>
 
 <div class="wrap">
 
-<!-- HERO -->
-<div class="card reveal">
-  <h1>Welcome to <span class="grad">SugarPie</span></h1>
-  <p>Cozy grind, smooth gameplay, clean PvP, weekly events.</p>
-  <button class="btn" onclick="copyIP()">Copy Server IP</button>
-  <a class="btn" href="https://discord.gg/study" target="_blank" rel="noreferrer" style="margin-left:10px">Join Discord</a>
-</div>
-
-<!-- VIBE -->
-<div class="card reveal" id="vibe">
-  <h2>Server Vibe</h2>
-  <div class="grid">
-    <div class="tile">⚡ Lag free gameplay</div>
-    <div class="tile">🛡️ Fair staff</div>
-    <div class="tile">🎉 Weekly events</div>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <div class="name">SugarPie</div>
+        <div class="sub">Neon-smooth Minecraft hub • clicks feel like magic</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <a class="tab" href="#home" data-sec="home">Home</a>
+      <a class="tab" href="#discord" data-sec="discord">Discord</a>
+      <a class="tab" href="#how" data-sec="how">How</a>
+      <a class="tab" href="#rules" data-sec="rules">Rules</a>
+      <a class="tab primary" href="https://discord.gg/study" target="_blank" rel="noreferrer">Join</a>
+    </div>
   </div>
-</div>
 
-<!-- STARTER -->
-<div class="card reveal" id="starter">
-  <h2>3 Minute Starter</h2>
-  <div class="grid">
-    <div class="tile">Join server</div>
-    <div class="tile">Claim base</div>
-    <div class="tile">Start grinding</div>
+  <!-- HERO -->
+  <div class="hero" id="home">
+    <div class="card reveal tilt">
+      <h1 class="title">Welcome to <span class="grad">SugarPie</span></h1>
+      <div class="desc">
+        A server that looks clean, runs smooth, and feels fair.
+        No noisy chaos — just cozy grind, weekly events, and a community that actually helps.
+      </div>
+
+      <div class="ipbox">
+        <div class="ip" reminds="ip" id="ipText">play.sugarpie.xyz</div>
+        <button class="btn" id="copyIp">📋 Copy IP</button>
+      </div>
+
+      <div class="row">
+        <a class="btn primary" href="#discord">💬 Discord Hub</a>
+        <a class="btn" href="#how">⚡ 3-Min Starter</a>
+        <a class="btn" href="#rules">🛡️ Rules</a>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <span class="pill">⚡ lag-free</span>
+        <span class="pill">🧠 smart economy</span>
+        <span class="pill">🎉 weekly events</span>
+        <span class="pill">🛡️ fair staff</span>
+      </div>
+    </div>
+
+    <div class="card reveal tilt">
+      <div class="sectionTitle">
+        <h2>Live Vibe</h2>
+        <span class="pill">✨ neon mode</span>
+      </div>
+      <div class="hr"></div>
+
+      <div class="grid" style="grid-template-columns:1fr; margin-top:12px">
+        <div class="tile">
+          <b>Feels different</b>
+          <div class="small">This page reacts to your mouse — your users will notice instantly.</div>
+        </div>
+        <div class="tile">
+          <b>Fast join</b>
+          <div class="small">Copy IP, join Discord, and you’re in — no confusion.</div>
+        </div>
+        <div class="tile">
+          <b>Community first</b>
+          <div class="small">Updates + support + events live in Discord.</div>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- ✅ DISCORD SECTION -->
-<div class="card reveal" id="discord">
-  <h2>Discord Hub</h2>
-  <p style="margin-top:6px">Updates, support, events, and giveaways — all in one place.</p>
-  <div class="grid">
-    <div class="tile">💬 Chat + community</div>
-    <div class="tile">🎁 Giveaways + events</div>
-    <div class="tile">🛠️ Support / reports</div>
+  <!-- DISCORD -->
+  <div class="card reveal" id="discord" style="margin-top:14px">
+    <div class="sectionTitle">
+      <h2>Discord Hub</h2>
+      <span class="pill">https://discord.gg/study</span>
+    </div>
+    <div class="hr"></div>
+
+    <div class="grid" style="margin-top:12px">
+      <div class="tile"><b>📢 Updates</b><div class="small">Announcements, changelogs, events.</div></div>
+      <div class="tile"><b>🛠️ Support</b><div class="small">Tickets, reports, staff help.</div></div>
+      <div class="tile"><b>🎁 Giveaways</b><div class="small">Drops, rewards, community fun.</div></div>
+    </div>
+
+    <div class="row">
+      <a class="btn primary" href="https://discord.gg/study" target="_blank" rel="noreferrer">🚀 Join Discord</a>
+      <button class="btn" id="copyDiscord">📋 Copy Invite</button>
+    </div>
   </div>
-  <a class="btn" href="https://discord.gg/study" target="_blank" rel="noreferrer">Join Discord: discord.gg/study</a>
-  <button class="btn" onclick="copyDiscord()" style="margin-left:10px">Copy Invite</button>
-</div>
 
-<!-- RULES -->
-<div class="card reveal" id="rules">
-  <h2>Rules</h2>
-  <div class="grid">
-    <div class="tile">No hacks</div>
-    <div class="tile">No toxicity</div>
-    <div class="tile">Respect players</div>
+  <!-- HOW -->
+  <div class="card reveal" id="how">
+    <div class="sectionTitle">
+      <h2>3-Minute Starter</h2>
+      <span class="pill">⏱️ fast</span>
+    </div>
+    <div class="hr"></div>
+
+    <div class="grid" style="margin-top:12px">
+      <div class="tile"><b>Step 1</b><div class="small">Click Join Discord → read #start-here.</div></div>
+      <div class="tile"><b>Step 2</b><div class="small">Copy IP → join server → claim base.</div></div>
+      <div class="tile"><b>Step 3</b><div class="small">Play events → earn rewards → flex.</div></div>
+    </div>
   </div>
-</div>
 
+  <!-- RULES -->
+  <div class="card reveal" id="rules">
+    <div class="sectionTitle">
+      <h2>Rules</h2>
+      <span class="pill">🍬 keep it sweet</span>
+    </div>
+    <div class="hr"></div>
+
+    <div class="grid" style="margin-top:12px">
+      <div class="tile"><b>No hacks</b><div class="small">X-ray / clients / exploits = action.</div></div>
+      <div class="tile"><b>No toxicity</b><div class="small">Respect players, keep chat clean.</div></div>
+      <div class="tile"><b>No scams</b><div class="small">Fair trades only, zero drama economy.</div></div>
+    </div>
+    <div class="small" style="margin-top:12px;opacity:.85">Staff decision final • Appeal on Discord</div>
+  </div>
+
+  <div class="footer">© <span id="y"></span> SugarPie • Not affiliated with Mojang/Microsoft</div>
 </div>
 
 <script>
-/* ===== SETTINGS ===== */
-const SERVER_IP = "play.sugarpie.xyz";
-const DISCORD_INVITE = "https://discord.gg/study";
+/* =========================
+   EDIT THESE 2 THINGS ONLY
+========================= */
+const SERVER_IP = "play.sugarpie.xyz";              // <- change to your real server IP
+const DISCORD_INVITE = "https://discord.gg/study";  // <- your invite (already set)
+/* ========================= */
 
-/* ===== TOAST ===== */
+document.getElementById("y").textContent = new Date().getFullYear();
+document.getElementById("ipText").textContent = SERVER_IP;
+
+/* Toast */
 let toastTimer;
-function showToast(msg){
+function toast(msg){
   const t = document.getElementById("toast");
   t.textContent = msg;
   t.style.opacity = "1";
@@ -276,73 +442,116 @@ function showToast(msg){
   toastTimer = setTimeout(()=> t.style.opacity="0", 1200);
 }
 
-/* ===== COPY IP ===== */
-function copyIP(){
-  navigator.clipboard.writeText(SERVER_IP);
-  showToast("Copied IP: " + SERVER_IP);
-  burst();
-}
-function copyDiscord(){
-  navigator.clipboard.writeText(DISCORD_INVITE);
-  showToast("Copied Discord: " + DISCORD_INVITE);
-  burst();
-}
+/* Copy buttons */
+document.getElementById("copyIp").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText(SERVER_IP); toast("Copied IP: " + SERVER_IP); shock(); }
+  catch{ toast("Copy failed (browser)"); }
+});
+document.getElementById("copyDiscord").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText(DISCORD_INVITE); toast("Copied Discord: " + DISCORD_INVITE); shock(); }
+  catch{ toast("Copy failed (browser)"); }
+});
 
-/* ===== SCROLL REVEAL ===== */
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting)e.target.classList.add("show");
-  });
-},{threshold:.15});
-document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+/* Reveal on scroll */
+const reveals = document.querySelectorAll(".reveal");
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add("show"); });
+},{threshold:0.12});
+reveals.forEach(el=>io.observe(el));
 
-/* ✅ ACTIVE TAB HIGHLIGHT (scroll pe) */
+/* Active tabs */
 const tabs = Array.from(document.querySelectorAll(".tab[data-sec]"));
-const sections = tabs.map(t => document.getElementById(t.dataset.sec)).filter(Boolean);
-
-const tabObserver = new IntersectionObserver((entries)=>{
+const secs = tabs.map(t=>document.getElementById(t.dataset.sec)).filter(Boolean);
+const tio = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
       tabs.forEach(t=>t.classList.remove("active"));
-      const m = tabs.find(t=>t.dataset.sec === e.target.id);
+      const m = tabs.find(t=>t.dataset.sec===e.target.id);
       if(m) m.classList.add("active");
     }
   });
 },{threshold:0.55});
-
-sections.forEach(s=>tabObserver.observe(s));
+secs.forEach(s=>tio.observe(s));
 if(tabs[0]) tabs[0].classList.add("active");
 
-/* ✅ CLICK SPARK BURST (more insane) */
-let lastMouse={x:innerWidth/2,y:innerHeight/2};
-window.addEventListener("mousemove",(e)=>{lastMouse.x=e.clientX;lastMouse.y=e.clientY;},{passive:true});
+/* 3D tilt (insane premium) */
+function addTilt(el){
+  const strength = 10;
+  el.addEventListener("mousemove",(ev)=>{
+    const r = el.getBoundingClientRect();
+    const px = (ev.clientX - r.left)/r.width - 0.5;
+    const py = (ev.clientY - r.top)/r.height - 0.5;
+    el.style.transform = `rotateY(${px*strength}deg) rotateX(${(-py)*strength}deg)`;
+  });
+  el.addEventListener("mouseleave",()=> el.style.transform = "rotateY(0deg) rotateX(0deg)");
+}
+document.querySelectorAll(".tilt").forEach(addTilt);
 
-function burst(){
-  const n=12;
+/* Cursor glow + trail */
+const glow = document.getElementById("cursorGlow");
+let mouse = {x: innerWidth/2, y: innerHeight/2, vx:0, vy:0, seen:false};
+window.addEventListener("mousemove",(e)=>{
+  mouse.vx = e.clientX - mouse.x;
+  mouse.vy = e.clientY - mouse.y;
+  mouse.x = e.clientX; mouse.y = e.clientY;
+  mouse.seen = true;
+  glow.style.opacity = "0.9";
+},{passive:true});
+window.addEventListener("mouseleave",()=> glow.style.opacity="0");
+
+/* Click shockwave + sparkles (very insane) */
+let last = {x: innerWidth/2, y: innerHeight/2};
+window.addEventListener("mousemove",(e)=>{ last.x=e.clientX; last.y=e.clientY; },{passive:true});
+
+function shock(){
+  // ring
+  const ring = document.createElement("div");
+  ring.style.position="fixed";
+  ring.style.left=last.x+"px";
+  ring.style.top=last.y+"px";
+  ring.style.width="14px";
+  ring.style.height="14px";
+  ring.style.borderRadius="999px";
+  ring.style.transform="translate(-50%,-50%) scale(1)";
+  ring.style.border="2px solid rgba(255,255,255,.55)";
+  ring.style.boxShadow="0 0 40px rgba(125,211,252,.25)";
+  ring.style.pointerEvents="none";
+  ring.style.zIndex="80";
+  ring.style.opacity="1";
+  ring.style.transition="transform .6s ease, opacity .6s ease";
+  document.body.appendChild(ring);
+  requestAnimationFrame(()=>{
+    ring.style.transform="translate(-50%,-50%) scale(14)";
+    ring.style.opacity="0";
+  });
+  setTimeout(()=>ring.remove(), 650);
+
+  // sparks
+  const n=16;
   for(let i=0;i<n;i++){
     const s=document.createElement("div");
-    const size=4+Math.random()*6;
+    const size=4+Math.random()*7;
     const a=Math.random()*Math.PI*2;
-    const d=26+Math.random()*52;
-    const x=lastMouse.x+Math.cos(a)*d;
-    const y=lastMouse.y+Math.sin(a)*d;
+    const dist=26+Math.random()*60;
+    const x=last.x+Math.cos(a)*dist;
+    const y=last.y+Math.sin(a)*dist;
 
     s.style.position="fixed";
-    s.style.left=(lastMouse.x-size/2)+"px";
-    s.style.top=(lastMouse.y-size/2)+"px";
+    s.style.left=(last.x-size/2)+"px";
+    s.style.top=(last.y-size/2)+"px";
     s.style.width=size+"px";
     s.style.height=size+"px";
     s.style.borderRadius="999px";
     s.style.pointerEvents="none";
     s.style.zIndex="80";
-    s.style.background="linear-gradient(135deg,#7dd3fc,#ff9bd5,#c084fc)";
+    s.style.background="linear-gradient(135deg, rgba(125,211,252,.95), rgba(255,155,213,.95), rgba(192,132,252,.95), rgba(74,222,128,.75))";
     s.style.opacity="1";
     s.style.transform="translate(0,0) scale(1)";
     s.style.transition="transform .55s ease, opacity .55s ease, filter .55s ease";
     document.body.appendChild(s);
 
     requestAnimationFrame(()=>{
-      s.style.transform=`translate(${x-lastMouse.x}px,${y-lastMouse.y}px) scale(.4)`;
+      s.style.transform=`translate(${x-last.x}px,${y-last.y}px) scale(.35)`;
       s.style.opacity="0";
       s.style.filter="blur(2px)";
     });
@@ -350,58 +559,127 @@ function burst(){
   }
 }
 
-/* ===== 4D DOT BACKGROUND ===== */
-const c=document.getElementById("bg");
-const ctx=c.getContext("2d");
-
-function resize(){ c.width=innerWidth; c.height=innerHeight; }
+/* ===== INSANE FX CANVAS: 4D particle field + trails ===== */
+const canvas = document.getElementById("fx");
+const ctx = canvas.getContext("2d", {alpha:true});
+let W,H,DPR;
+function resize(){
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = canvas.width = Math.floor(innerWidth * DPR);
+  H = canvas.height = Math.floor(innerHeight * DPR);
+  canvas.style.width = innerWidth + "px";
+  canvas.style.height = innerHeight + "px";
+}
+window.addEventListener("resize", resize, {passive:true});
 resize();
-window.onresize=resize;
 
-let mouse={x:0,y:0};
-window.onmousemove=e=>{ mouse.x=e.clientX; mouse.y=e.clientY; };
+const COLORS = [
+  [125,211,252], [255,155,213], [192,132,252], [74,222,128], [255,255,255]
+];
 
-let dots=[];
-for(let i=0;i<240;i++){
-  dots.push({
-    x:Math.random()*innerWidth,
-    y:Math.random()*innerHeight,
-    z:Math.random()+.5,
-    hue: Math.random()*360
+const COUNT = 320;                 // insane but safe (DPR capped)
+const particles = [];
+const rand=(a,b)=>a+Math.random()*(b-a);
+
+for(let i=0;i<COUNT;i++){
+  const col = COLORS[Math.floor(Math.random()*COLORS.length)];
+  particles.push({
+    x: rand(0, innerWidth),
+    y: rand(0, innerHeight),
+    z: rand(0.25, 1.15),
+    r: rand(0.5, 1.8),
+    sx: rand(-0.18, 0.18),
+    sy: rand(-0.14, 0.14),
+    phase: rand(0, Math.PI*2),
+    cr: col[0], cg: col[1], cb: col[2]
   });
 }
 
-function draw(){
-  ctx.clearRect(0,0,c.width,c.height);
+function loop(t){
+  // motion blur trail effect
+  ctx.fillStyle = "rgba(4,5,10,0.22)";
+  ctx.fillRect(0,0,W,H);
 
-  dots.forEach(d=>{
-    let dx=d.x-mouse.x;
-    let dy=d.y-mouse.y;
-    let dist=Math.sqrt(dx*dx+dy*dy);
-    let lift=Math.max(0,1-dist/220);
+  // cursor glow follow
+  if(mouse.seen){
+    glow.style.left = mouse.x + "px";
+    glow.style.top  = mouse.y + "px";
+  }
 
-    const r=d.z*2+lift*5;
+  const mx = mouse.x * DPR, my = mouse.y * DPR;
 
+  for(let i=0;i<COUNT;i++){
+    const p = particles[i];
+
+    // drift
+    p.x += p.sx * (0.65 + p.z);
+    p.y += p.sy * (0.65 + p.z);
+
+    // 4D wobble
+    const wob = Math.sin(t*0.0016 + p.phase) * (0.35 + 0.9*p.z);
+    p.x += wob * 0.06;
+    p.y += Math.cos(t*0.0012 + p.phase) * 0.04;
+
+    // wrap
+    if(p.x < -40) p.x = innerWidth + 40;
+    if(p.x > innerWidth + 40) p.x = -40;
+    if(p.y < -40) p.y = innerHeight + 40;
+    if(p.y > innerHeight + 40) p.y = -40;
+
+    // mouse lift (depth)
+    const dx = p.x - mouse.x, dy = p.y - mouse.y;
+    const dist = Math.hypot(dx,dy);
+    const infl = Math.max(0, 1 - dist/260);
+    const z = p.z + infl*0.85;
+    const par = (z - 0.25) * 22;
+
+    const px = p.x * DPR;
+    const py = p.y * DPR;
+
+    // parallax shift + velocity shimmer
+    const sx = px + ((px - mx)/(260*DPR))*par + (mouse.vx*0.018*infl)*DPR;
+    const sy = py + ((py - my)/(260*DPR))*par + (mouse.vy*0.018*infl)*DPR;
+
+    const radius = (p.r + infl*2.6) * DPR * (0.70 + z);
+    const alpha = 0.10 + 0.55*z + infl*0.22;
+
+    // glow
     ctx.beginPath();
-    ctx.arc(d.x,d.y,r,0,Math.PI*2);
-
-    // little color glow (insane)
-    ctx.fillStyle=`hsla(${d.hue},90%,70%,${0.15+d.z*0.35+lift*0.25})`;
+    ctx.arc(sx, sy, radius*2.4, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(${p.cr},${p.cg},${p.cb},${Math.min(0.16, alpha*0.10)})`;
     ctx.fill();
 
-    d.x+=Math.sin(d.z)*.28;
-    d.y+=Math.cos(d.z)*.28;
+    // core
+    ctx.beginPath();
+    ctx.arc(sx, sy, radius, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(${p.cr},${p.cg},${p.cb},${Math.min(0.88, alpha)})`;
+    ctx.fill();
 
-    if(d.x>innerWidth)d.x=0;
-    if(d.y>innerHeight)d.y=0;
-    if(d.x<0)d.x=innerWidth;
-    if(d.y<0)d.y=innerHeight;
-  });
+    // tiny connection lines near cursor = “insane”
+    if(infl > 0.55){
+      for(let j=i+1;j<i+9 && j<COUNT;j++){
+        const q = particles[j];
+        const qx = q.x*DPR, qy=q.y*DPR;
+        const dd = Math.hypot(qx - px, qy - py);
+        if(dd < 160*DPR){
+          const a = (1 - dd/(160*DPR)) * 0.18 * infl;
+          ctx.strokeStyle = `rgba(255,255,255,${a})`;
+          ctx.lineWidth = 1 * DPR;
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(qx, qy);
+          ctx.stroke();
+        }
+      }
+    }
+  }
 
-  requestAnimationFrame(draw);
+  // decay velocity
+  mouse.vx *= 0.85; mouse.vy *= 0.85;
+
+  requestAnimationFrame(loop);
 }
-draw();
+requestAnimationFrame(loop);
 </script>
-
 </body>
 </html>
