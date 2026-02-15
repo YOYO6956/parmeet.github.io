@@ -11,7 +11,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
 
         body {
-            background-color: #020005; /* Deep Space Black */
+            background-color: #020005; 
             color: #fff;
             overflow: hidden; /* Lock scroll until login */
             display: flex;
@@ -24,159 +24,43 @@
 
         /* HYPERSPACE CANVAS */
         #warp-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 0;
-            cursor: crosshair;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; cursor: crosshair;
         }
 
-        /* --- LOGIN POPUP OVERLAY (NEW) --- */
-        #login-overlay {
+        /* --- 1. TOP LEFT USER PROFILE (NEW) --- */
+        .user-profile {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(2, 0, 5, 0.85); /* Dark tint */
+            top: 30px;
+            left: 40px;
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(15px);
-            z-index: 5000; /* Highest priority */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.5s ease-in-out;
-        }
-
-        .login-box {
-            background: rgba(20, 10, 30, 0.6);
-            border: 2px solid #ff007f;
-            padding: 40px;
-            border-radius: 30px;
-            text-align: center;
-            width: 400px;
-            max-width: 90%;
-            box-shadow: 0 0 50px rgba(255, 0, 127, 0.4);
-            transform: scale(0);
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .skin-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 15px;
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-
-        .login-title {
-            font-size: 2rem;
-            font-weight: 900;
-            margin-bottom: 5px;
-            color: #fff;
-            text-transform: uppercase;
-        }
-
-        .login-subtitle {
-            font-size: 0.9rem;
-            color: #d1b3ff;
-            margin-bottom: 25px;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid #ff8e8b;
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1.1rem;
-            text-align: center;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .login-input:focus {
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
-            border-color: #ff007f;
-        }
-
-        /* Bedrock Toggle Switch */
-        .bedrock-option {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 25px;
-            cursor: pointer;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 4px; bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: #ff007f; }
-        input:checked + .slider:before { transform: translateX(24px); }
-
-        .bedrock-label { font-size: 0.9rem; color: #bbb; }
-
-        /* Enter Button */
-        .enter-btn {
-            background: linear-gradient(90deg, #ff007f, #ff6b6b);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 50px;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4);
-            text-transform: uppercase;
-            width: 100%;
+            padding: 8px 25px 8px 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+            opacity: 0; /* Hidden until login */
+            transform: translateX(-50px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .enter-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(255, 0, 127, 0.7);
+        .user-head {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            border: 2px solid #ff007f;
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0) translateY(50px); opacity: 0; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
+        .user-info {
+            display: flex; flex-direction: column;
         }
 
-        @keyframes zoomOut {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(3); opacity: 0; }
-        }
-        /* ----------------------------------- */
+        .user-name { font-weight: 700; font-size: 1.1rem; color: #fff; }
+        .user-status { font-size: 0.75rem; color: #00ff88; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* LIVE PLAYER COUNTER */
+        /* --- LIVE PLAYER COUNTER (TOP RIGHT) --- */
         .player-counter {
             position: fixed;
             top: 30px;
@@ -196,201 +80,144 @@
             font-weight: 700;
             transition: all 0.3s ease;
             cursor: default;
-            /* Hidden initially, shown after login */
-            opacity: 0; 
-            transform: translateY(-20px);
+            opacity: 0; transform: translateY(-20px);
         }
-
         .live-dot {
-            width: 12px;
-            height: 12px;
-            background-color: #00ff88;
-            border-radius: 50%;
+            width: 12px; height: 12px; background-color: #00ff88; border-radius: 50%;
             box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
             animation: pulseDot 1.5s infinite alternate;
         }
 
-        @keyframes pulseDot {
-            0% { transform: scale(1); opacity: 0.7; }
-            100% { transform: scale(1.3); opacity: 1; }
+        /* --- LOGIN POPUP --- */
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(2, 0, 5, 0.85); backdrop-filter: blur(15px);
+            z-index: 5000; display: flex; justify-content: center; align-items: center;
+            transition: all 0.5s ease-in-out;
         }
 
-        /* MAIN CONTAINER (HIDDEN INITIALLY) */
+        .login-box {
+            background: rgba(20, 10, 30, 0.6); border: 2px solid #ff007f;
+            padding: 40px; border-radius: 30px; text-align: center; width: 400px; max-width: 90%;
+            box-shadow: 0 0 50px rgba(255, 0, 127, 0.4); transform: scale(0);
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .skin-avatar {
+            width: 100px; height: 100px; border-radius: 15px; border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); margin-bottom: 20px;
+        }
+
+        .login-input {
+            width: 100%; padding: 15px; background: rgba(0,0,0,0.5);
+            border: 1px solid #ff8e8b; border-radius: 10px; color: #fff;
+            font-size: 1.1rem; text-align: center; outline: none; margin-bottom: 20px; transition: 0.3s;
+        }
+        .login-input:focus { border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 0, 127, 0.6); }
+
+        .bedrock-option { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; cursor: pointer; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #ff007f; }
+        input:checked + .slider:before { transform: translateX(24px); }
+        .bedrock-label { font-size: 0.9rem; color: #bbb; }
+
+        .enter-btn {
+            background: linear-gradient(90deg, #ff007f, #ff6b6b); color: white; border: none;
+            padding: 15px 40px; font-size: 1.2rem; font-weight: bold; border-radius: 50px;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4); text-transform: uppercase; width: 100%;
+        }
+        .enter-btn:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(255, 0, 127, 0.7); }
+
+        /* --- MAIN LAYOUT --- */
         .glass-wrapper {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 100px 20px 50px 20px;
-            pointer-events: none; 
-            width: 100%;
-            max-width: 1300px;
-            opacity: 0; /* Hidden until login */
-            transform: scale(0.95);
-            transition: all 0.8s ease-out;
+            position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;
+            padding: 100px 20px 50px 20px; width: 100%; max-width: 1400px;
+            opacity: 0; transform: scale(0.95); transition: all 0.8s ease-out; pointer-events: none;
         }
+        .wrapper-visible { opacity: 1 !important; transform: scale(1) !important; }
 
-        .wrapper-visible {
-            opacity: 1 !important;
-            transform: scale(1) !important;
-        }
-
-        /* GLOWING TITLE */
         h1 {
-            font-size: 5.5rem;
-            font-weight: 900;
+            font-size: 5rem; font-weight: 900;
             background: linear-gradient(135deg, #ff007f, #ff8e8b, #fff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-            text-shadow: 0px 10px 30px rgba(255, 0, 127, 0.4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 5px; text-shadow: 0px 10px 30px rgba(255, 0, 127, 0.4);
             animation: floatText 4s ease-in-out infinite;
         }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #d1b3ff;
-            letter-spacing: 3px;
-            margin-bottom: 50px;
-            text-transform: uppercase;
-        }
-
+        .subtitle { font-size: 1.2rem; color: #d1b3ff; letter-spacing: 3px; margin-bottom: 50px; text-transform: uppercase; }
         .hint-text {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.95rem;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-            animation: pulseHint 2s infinite;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            pointer-events: none;
+            color: rgba(255, 255, 255, 0.6); font-size: 0.95rem; letter-spacing: 2px;
+            margin-bottom: 25px; animation: pulseHint 2s infinite;
+            background: rgba(255, 255, 255, 0.05); padding: 8px 15px; border-radius: 20px;
         }
 
-        /* CARDS GRID */
-        .grid {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-            pointer-events: auto; 
-            width: 100%;
-        }
+        /* GRID */
+        .grid { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; pointer-events: auto; width: 100%; }
 
         .card {
-            background: rgba(15, 5, 25, 0.6);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            padding: 40px;
-            width: 380px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05);
+            background: rgba(15, 5, 25, 0.6); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 30px;
+            width: 320px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
-
         .card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(255, 0, 127, 0.6);
+            transform: translateY(-10px) scale(1.02); border-color: rgba(255, 0, 127, 0.6);
             box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255, 0, 127, 0.3);
         }
+        .card h2 { font-size: 1.6rem; margin-bottom: 20px; color: #fff; border-bottom: 2px solid rgba(255, 0, 127, 0.3); padding-bottom: 10px; }
 
-        .card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            color: #fff;
-            border-bottom: 2px solid rgba(255, 0, 127, 0.3);
-            padding-bottom: 15px;
+        /* --- 2. STORE RANKS STYLING --- */
+        .rank-list { list-style: none; text-align: left; margin-bottom: auto; }
+        .rank-item {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        /* --- IP WAVE EFFECT --- */
-        .ip-display {
-            background: rgba(0,0,0,0.8);
-            padding: 15px;
-            border-radius: 12px;
-            font-family: monospace;
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #ffffff;
-            border: 1px dashed rgba(255, 255, 255, 0.3);
-            margin-bottom: auto;
-            margin-top: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .ip-display:hover {
-            border-color: #ff007f;
-            transform: scale(1.05);
-            background: linear-gradient(to right, #ffffff 0%, #ff007f 20%, #ff8e8b 40%, #ffffff 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            animation: shine 2s linear infinite;
-        }
-
-        @keyframes shine { to { background-position: 200% center; } }
-
-        .rules-list { text-align: left; list-style: none; margin-bottom: auto; }
-        .rules-list li {
-            margin-bottom: 18px; padding-left: 35px; position: relative;
-            font-size: 1.1rem; color: #d1b3ff; transition: transform 0.3s ease, color 0.3s ease;
-        }
-        .rules-list li:hover { transform: translateX(10px); color: #fff; }
-        .rules-list li::before {
-            content: ''; position: absolute; left: 0; top: 8px;
-            width: 12px; height: 12px; border-radius: 50%;
-            background: #ff007f; box-shadow: 0 0 10px #ff007f, 0 0 20px #ff8e8b;
-        }
+        .rank-info { display: flex; flex-direction: column; }
+        .rank-name { font-weight: bold; font-size: 1.1rem; color: #ff8e8b; }
+        .rank-perk { font-size: 0.8rem; color: #aaa; }
+        .rank-price { font-weight: bold; color: #00ff88; font-size: 1.1rem; }
 
         .btn {
-            display: inline-block; width: 100%; padding: 16px 0; border-radius: 12px;
-            font-size: 1.2rem; font-weight: 700; cursor: pointer; border: none;
-            text-decoration: none; transition: 0.3s; text-transform: uppercase; margin-top: 25px;
+            display: inline-block; width: 100%; padding: 12px 0; border-radius: 12px;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer; border: none; text-decoration: none;
+            transition: 0.3s; text-transform: uppercase; margin-top: 20px;
         }
+        .btn-mc { background: linear-gradient(90deg, #ff007f, #ff6b6b); color: #fff; }
+        .btn-discord { background: #5865F2; color: #fff; display: flex; justify-content: center; gap: 10px; }
+        .btn-store { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
-        .btn-mc { background: linear-gradient(90deg, #ff007f, #ff6b6b); color: #fff; box-shadow: 0 10px 20px rgba(255, 0, 127, 0.3); }
-        .btn-mc:hover { box-shadow: 0 15px 30px rgba(255, 0, 127, 0.6); transform: translateY(-3px); }
+        .ip-display {
+            background: rgba(0,0,0,0.8); padding: 15px; border-radius: 12px; font-family: monospace;
+            font-size: 1.3rem; font-weight: bold; color: #fff; border: 1px dashed rgba(255, 255, 255, 0.3);
+            margin-bottom: auto; margin-top: 20px; cursor: pointer; transition: 0.3s;
+        }
+        .ip-display:hover {
+            border-color: #ff007f; transform: scale(1.05);
+            background: linear-gradient(to right, #ffffff 0%, #ff007f 20%, #ff8e8b 40%, #ffffff 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 2s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes floatText { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes pulseDot { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.3); opacity: 1; } }
+        @keyframes popIn { 0% { transform: scale(0) translateY(50px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes zoomOut { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
 
-        .btn-discord { background: #5865F2; color: #fff; box-shadow: 0 10px 20px rgba(88, 101, 242, 0.3); display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .btn-discord:hover { background: #4752C4; box-shadow: 0 15px 30px rgba(88, 101, 242, 0.6); transform: translateY(-3px); }
-
-        @keyframes floatText {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        @keyframes pulseHint {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-
-        .balloon {
-            position: fixed; bottom: -150px; width: 50px; height: 65px;
-            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3);
-            z-index: 999; pointer-events: none; animation: floatUp ease-in forwards;
-        }
-        .balloon::before {
-            content: ''; position: absolute; bottom: -40px; left: 50%;
-            width: 1px; height: 40px; background: rgba(255,255,255,0.3);
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
-        }
+        /* Rules list */
+        .rules-list { text-align: left; list-style: none; }
+        .rules-list li { margin-bottom: 12px; padding-left: 25px; position: relative; font-size: 1rem; color: #d1b3ff; }
+        .rules-list li::before { content: '•'; position: absolute; left: 0; color: #ff007f; font-size: 1.5rem; line-height: 1rem; }
 
         @media (max-width: 768px) {
-            .player-counter { top: 15px; right: 50%; transform: translateX(50%); }
-            .login-box { padding: 30px 20px; }
+            .player-counter { top: 15px; right: 10px; padding: 8px 15px; font-size: 0.9rem; }
+            .user-profile { top: 15px; left: 10px; padding: 5px 15px 5px 5px; }
+            .user-head { width: 35px; height: 35px; }
+            .user-name { font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -398,17 +225,25 @@
 
     <canvas id="warp-canvas"></canvas>
 
+    <div class="user-profile" id="user-profile">
+        <img src="https://minotar.net/helm/steve/100.png" class="user-head" id="profile-head">
+        <div class="user-info">
+            <span class="user-name" id="profile-name">Steve</span>
+            <span class="user-status">Logged In</span>
+        </div>
+    </div>
+
+    <div class="player-counter" id="counter-pill">
+        <div class="live-dot" id="status-dot"></div>
+        <div id="player-count">Pinging...</div>
+    </div>
+
     <div id="login-overlay">
         <div class="login-box">
             <img src="https://minotar.net/helm/steve/100.png" id="skin-preview" class="skin-avatar">
-            
-            <h2 class="login-title">Identify Yourself</h2>
-            <div class="login-subtitle">Enter username to initialize...</div>
-            
-            <div class="input-group">
-                <input type="text" id="username-input" class="login-input" placeholder="Your Username" autocomplete="off">
-            </div>
-
+            <h2 style="font-size: 2rem; margin-bottom: 5px; text-transform: uppercase;">Identity Gate</h2>
+            <div style="color: #aaa; margin-bottom: 25px;">Enter username to initialize...</div>
+            <input type="text" id="username-input" class="login-input" placeholder="Your Username" autocomplete="off">
             <div class="bedrock-option">
                 <label class="switch">
                     <input type="checkbox" id="bedrock-toggle">
@@ -416,48 +251,72 @@
                 </label>
                 <span class="bedrock-label">I'm a Bedrock Player (Adds .)</span>
             </div>
-
             <button class="enter-btn" onclick="enterSite()">ENTER WORLD</button>
         </div>
-    </div>
-
-    <div class="player-counter" id="counter-pill">
-        <div class="live-dot" id="status-dot"></div>
-        <div id="player-count">Pinging Server...</div>
     </div>
 
     <div class="glass-wrapper" id="main-content">
         <h1 id="main-title">SugarPie</h1>
         <div class="subtitle">Next-Gen Survival Experience</div>
-        
         <div class="hint-text">[ CLICK AND HOLD FOR WARP SPEED ]</div>
 
         <div class="grid">
-            <div class="card" id="mc-card">
+            <div class="card">
                 <h2>Join Server</h2>
-                <p style="color: #aaa; line-height: 1.5;">
-                    Ready for a sweet adventure? Copy the IP below and paste it into your Minecraft client!
-                </p>
+                <p style="color: #aaa; margin-bottom: auto;">Ready for adventure? Copy the IP below!</p>
                 <div class="ip-display" id="server-ip">play.sugarpie.net</div>
                 <button class="btn btn-mc" onclick="copyIP()">Copy IP Address</button>
             </div>
 
-            <div class="card" id="rules-card">
+            <div class="card">
                 <h2>Server Rules</h2>
                 <ul class="rules-list">
-                    <li>No hacking, x-raying, or unfair client mods.</li>
-                    <li>No griefing or stealing from other bases.</li>
-                    <li>Be respectful. Zero tolerance for toxicity.</li>
-                    <li>Replant crops and keep the world clean.</li>
-                    <li>Listen to admins and have fun!</li>
+                    <li>No hacking or x-raying.</li>
+                    <li>No griefing/stealing.</li>
+                    <li>Be respectful in chat.</li>
+                    <li>Replant crops & trees.</li>
+                    <li>Have fun & enjoy!</li>
                 </ul>
             </div>
 
-            <div class="card" id="discord-card">
+            <div class="card">
+                <h2>Buy Ranks</h2>
+                <ul class="rank-list">
+                    <li class="rank-item">
+                        <div class="rank-info">
+                            <span class="rank-name" style="color: #a0f06d;">Fruit</span>
+                            <span class="rank-perk">2 Sethomes</span>
+                        </div>
+                        <span class="rank-price">₹19/wk</span>
+                    </li>
+                    <li class="rank-item">
+                        <div class="rank-info">
+                            <span class="rank-name" style="color: #ff6b6b;">Cake</span>
+                            <span class="rank-perk">Starter Kit Included</span>
+                        </div>
+                        <span class="rank-price">₹79/mo</span>
+                    </li>
+                    <li class="rank-item">
+                        <div class="rank-info">
+                            <span class="rank-name" style="color: #ff8c00;">Burn</span>
+                            <span class="rank-perk">Premium Perks</span>
+                        </div>
+                        <span class="rank-price">₹299/mo</span>
+                    </li>
+                    <li class="rank-item">
+                        <div class="rank-info">
+                            <span class="rank-name" style="color: #bf00ff;">Beast</span>
+                            <span class="rank-perk">God Status</span>
+                        </div>
+                        <span class="rank-price">₹499/mo</span>
+                    </li>
+                </ul>
+                <button class="btn btn-store">Visit Store</button>
+            </div>
+
+            <div class="card">
                 <h2>Community</h2>
-                <p style="color: #aaa; line-height: 1.5;">
-                    Join our massive community! Click below to instantly launch the Discord App and get chatting.
-                </p>
+                <p style="color: #aaa; margin-bottom: 20px;">Join our massive community on Discord!</p>
                 <a href="https://discord.gg/ZmCVr8c6sf" target="_blank" class="btn btn-discord" style="margin-top: auto;">
                     Launch Discord
                 </a>
@@ -466,26 +325,22 @@
     </div>
 
     <script>
-        // --- 0. LOGIN LOGIC ---
+        // --- LOGIN & PROFILE LOGIC ---
         const usernameInput = document.getElementById('username-input');
         const skinPreview = document.getElementById('skin-preview');
         const bedrockToggle = document.getElementById('bedrock-toggle');
         const loginOverlay = document.getElementById('login-overlay');
         const mainContent = document.getElementById('main-content');
         const counterPill = document.getElementById('counter-pill');
+        const userProfile = document.getElementById('user-profile'); // NEW
+        const profileHead = document.getElementById('profile-head'); // NEW
+        const profileName = document.getElementById('profile-name'); // NEW
         const mainTitle = document.getElementById('main-title');
 
-        // Dynamic Skin Update
         usernameInput.addEventListener('input', function() {
             let name = this.value;
-            // If bedrock toggle is checked, don't show the dot in the lookup 
-            // because minotar mostly serves Java skins. 
-            // But we keep the toggle to make users feel included.
-            if(name.length > 0) {
-                skinPreview.src = `https://minotar.net/helm/${name}/100.png`;
-            } else {
-                skinPreview.src = `https://minotar.net/helm/steve/100.png`;
-            }
+            if(name.length > 0) skinPreview.src = `https://minotar.net/helm/${name}/100.png`;
+            else skinPreview.src = `https://minotar.net/helm/steve/100.png`;
         });
 
         function enterSite() {
@@ -496,160 +351,104 @@
                 return;
             }
 
-            // Handle Bedrock Name Logic
-            if(bedrockToggle.checked && !name.startsWith('.')) {
-                name = "." + name; // Visually we treat them as bedrock
-            }
+            if(bedrockToggle.checked && !name.startsWith('.')) name = "." + name;
 
-            // 1. Zoom out animation for popup
+            // UPDATE TOP LEFT PROFILE
+            profileName.innerText = name;
+            // For skin url, we remove the dot if it exists because Minotar handles java names better
+            let skinName = name.startsWith('.') ? name.substring(1) : name;
+            profileHead.src = `https://minotar.net/helm/${skinName}/100.png`;
+
+            // Animations
             document.querySelector('.login-box').style.animation = "zoomOut 0.5s forwards";
-            
-            // 2. Fade out overlay background
             loginOverlay.style.opacity = "0";
 
-            // 3. Remove overlay after animation and Reveal Site
             setTimeout(() => {
                 loginOverlay.style.display = "none";
-                document.body.style.overflow = "auto"; // Re-enable scrolling
+                document.body.style.overflow = "auto";
                 
-                // Show Main Content with Fade In
                 mainContent.classList.add('wrapper-visible');
                 
-                // Show Counter
-                counterPill.style.opacity = "1";
-                counterPill.style.transform = "translateY(0)";
+                // Show Counter & User Profile
+                counterPill.style.opacity = "1"; counterPill.style.transform = "translateY(0)";
+                userProfile.style.opacity = "1"; userProfile.style.transform = "translateX(0)";
 
-                // Personalize Title
                 mainTitle.innerText = `Welcome, ${name}`;
-                // Keep the font size slightly smaller if name is huge
                 if(name.length > 10) mainTitle.style.fontSize = "4rem";
-
             }, 500);
         }
 
-        // --- 1. LIVE PLAYER COUNTER ---
+        // --- HYPERSPACE ENGINE ---
+        const canvas = document.getElementById('warp-canvas'); const ctx = canvas.getContext('2d');
+        let width, height, stars = []; const numStars = 1000;
+        let speed = 2; let warpSpeed = 50; let targetSpeed = speed; let currentSpeed = speed;
+        const starColors = ['#ff007f', '#ff8e8b', '#ffffff', '#d1b3ff'];
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;
+            stars = []; for (let i = 0; i < numStars; i++) stars.push(new Star());
+        }
+        class Star {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = (Math.random() - 0.5) * width * 2; this.y = (Math.random() - 0.5) * height * 2;
+                this.z = Math.random() * width; this.pz = this.z;
+                this.color = starColors[Math.floor(Math.random() * starColors.length)];
+            }
+            update() { this.z -= currentSpeed; if (this.z <= 0) { this.reset(); this.pz = this.z; } }
+            draw() {
+                let fov = width;
+                let sx = (this.x / this.z) * fov + width / 2; let sy = (this.y / this.z) * fov + height / 2;
+                let px = (this.x / this.pz) * fov + width / 2; let py = (this.y / this.pz) * fov + height / 2;
+                this.pz = this.z; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(sx, sy);
+                let thickness = (1 - this.z / width) * 2; ctx.lineWidth = Math.max(thickness, 0.2);
+                ctx.strokeStyle = this.color; ctx.stroke();
+            }
+        }
+        function animateWarp() {
+            currentSpeed += (targetSpeed - currentSpeed) * 0.05;
+            ctx.fillStyle = 'rgba(2, 0, 5, 0.4)'; ctx.fillRect(0, 0, width, height);
+            for (let i = 0; i < stars.length; i++) { stars[i].update(); stars[i].draw(); }
+            requestAnimationFrame(animateWarp);
+        }
+        window.addEventListener('mousedown', () => targetSpeed = warpSpeed);
+        window.addEventListener('mouseup', () => targetSpeed = speed);
+        window.addEventListener('resize', initCanvas);
+        initCanvas(); animateWarp();
+
+        // --- 3D Card Tracking ---
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                const centerX = rect.width / 2; const centerY = rect.height / 2;
+                card.style.transform = `perspective(1000px) rotateX(${((y - centerY)/centerY)*-10}deg) rotateY(${((x - centerX)/centerX)*10}deg) scale3d(1.05, 1.05, 1.05)`;
+            });
+            card.addEventListener('mouseleave', () => card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`);
+        });
+
+        function copyIP() {
+            navigator.clipboard.writeText(document.getElementById("server-ip").innerText);
+            document.querySelector(".btn-mc").innerText = "IP COPIED! 🎮";
+            setTimeout(() => document.querySelector(".btn-mc").innerText = "Copy IP Address", 2000);
+        }
+
+        // --- Player Counter ---
         const serverIP = "play.sugarpie.net"; 
         async function updatePlayerCount() {
             try {
                 const response = await fetch(`https://api.mcsrvstat.us/2/${serverIP}`);
                 const data = await response.json();
-                const countText = document.getElementById("player-count");
-                const statusDot = document.getElementById("status-dot");
-
                 if (data.online) {
-                    countText.innerText = `${data.players.online} Players Online`;
-                    statusDot.style.backgroundColor = "#00ff88";
-                    statusDot.style.boxShadow = "0 0 10px #00ff88, 0 0 20px #00ff88";
+                    document.getElementById("player-count").innerText = `${data.players.online} Players Online`;
+                    document.getElementById("status-dot").style.backgroundColor = "#00ff88";
                 } else {
-                    countText.innerText = "Server Offline";
-                    statusDot.style.backgroundColor = "#ff0033";
-                    statusDot.style.boxShadow = "0 0 10px #ff0033, 0 0 20px #ff0033";
+                    document.getElementById("player-count").innerText = "Server Offline";
+                    document.getElementById("status-dot").style.backgroundColor = "#ff0033";
                 }
-            } catch (error) { document.getElementById("player-count").innerText = "Stats Unavailable"; }
+            } catch (e) { document.getElementById("player-count").innerText = "Stats Unavailable"; }
         }
-        updatePlayerCount();
-        setInterval(updatePlayerCount, 60000);
-
-        // --- 2. HYPERSPACE WARP ENGINE ---
-        const canvas = document.getElementById('warp-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width, height, stars = [];
-        const numStars = 1000;
-        let speed = 2; let warpSpeed = 50; 
-        let targetSpeed = speed; let currentSpeed = speed;
-        const starColors = ['#ff007f', '#ff8e8b', '#ffffff', '#d1b3ff'];
-
-        function initCanvas() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            stars = [];
-            for (let i = 0; i < numStars; i++) stars.push(new Star());
-        }
-
-        class Star {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = (Math.random() - 0.5) * width * 2;
-                this.y = (Math.random() - 0.5) * height * 2;
-                this.z = Math.random() * width;
-                this.pz = this.z;
-                this.color = starColors[Math.floor(Math.random() * starColors.length)];
-            }
-            update() {
-                this.z -= currentSpeed;
-                if (this.z <= 0) { this.reset(); this.pz = this.z; }
-            }
-            draw() {
-                let fov = width;
-                let sx = (this.x / this.z) * fov + width / 2;
-                let sy = (this.y / this.z) * fov + height / 2;
-                let px = (this.x / this.pz) * fov + width / 2;
-                let py = (this.y / this.pz) * fov + height / 2;
-                this.pz = this.z;
-                ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(sx, sy);
-                let thickness = (1 - this.z / width) * 2;
-                ctx.lineWidth = Math.max(thickness, 0.2);
-                ctx.strokeStyle = this.color; ctx.stroke();
-            }
-        }
-
-        function animateWarp() {
-            currentSpeed += (targetSpeed - currentSpeed) * 0.05;
-            ctx.fillStyle = 'rgba(2, 0, 5, 0.4)';
-            ctx.fillRect(0, 0, width, height);
-            for (let i = 0; i < stars.length; i++) { stars[i].update(); stars[i].draw(); }
-            requestAnimationFrame(animateWarp);
-        }
-
-        window.addEventListener('mousedown', () => targetSpeed = warpSpeed);
-        window.addEventListener('mouseup', () => targetSpeed = speed);
-        window.addEventListener('touchstart', () => targetSpeed = warpSpeed);
-        window.addEventListener('touchend', () => targetSpeed = speed);
-        window.addEventListener('resize', initCanvas);
-
-        initCanvas(); animateWarp();
-
-        // --- 3. 3D Card Tracking ---
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                const centerX = rect.width / 2; const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -10; 
-                const rotateY = ((x - centerX) / centerX) * 10;
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            });
-        });
-
-        // --- 4. Copy IP & Balloons ---
-        function copyIP() {
-            const ip = document.getElementById("server-ip").innerText;
-            navigator.clipboard.writeText(ip);
-            const btn = document.querySelector(".btn-mc");
-            btn.innerText = "IP COPIED! 🎮";
-            setTimeout(() => btn.innerText = "Copy IP Address", 2000);
-        }
-        const balloonColors = ['#ff007f', '#ff8e8b', '#ffffff', '#4752C4'];
-        function releaseBalloons() {
-            for(let i = 0; i < 20; i++) {
-                setTimeout(() => {
-                    const balloon = document.createElement('div');
-                    balloon.className = 'balloon';
-                    balloon.style.background = `radial-gradient(circle at 15px 15px, ${balloonColors[Math.floor(Math.random() * balloonColors.length)]}, #111)`;
-                    balloon.style.left = Math.random() * 100 + 'vw';
-                    const duration = Math.random() * 4 + 5; 
-                    balloon.style.animationDuration = duration + 's';
-                    document.body.appendChild(balloon);
-                    setTimeout(() => balloon.remove(), duration * 1000);
-                }, i * 300);
-            }
-        }
-        releaseBalloons(); setInterval(releaseBalloons, 120000);
+        updatePlayerCount(); setInterval(updatePlayerCount, 60000);
     </script>
 </body>
 </html>
