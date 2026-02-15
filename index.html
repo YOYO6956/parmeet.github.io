@@ -27,7 +27,7 @@
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; cursor: crosshair;
         }
 
-        /* --- 1. TOP LEFT USER PROFILE (NEW) --- */
+        /* --- TOP LEFT USER PROFILE --- */
         .user-profile {
             position: fixed;
             top: 30px;
@@ -46,46 +46,25 @@
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-
-        .user-head {
-            width: 45px; height: 45px;
-            border-radius: 50%;
-            border: 2px solid #ff007f;
-        }
-
-        .user-info {
-            display: flex; flex-direction: column;
-        }
-
+        .user-head { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #ff007f; }
+        .user-info { display: flex; flex-direction: column; }
         .user-name { font-weight: 700; font-size: 1.1rem; color: #fff; }
         .user-status { font-size: 0.75rem; color: #00ff88; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- LIVE PLAYER COUNTER (TOP RIGHT) --- */
+        /* --- LIVE PLAYER COUNTER --- */
         .player-counter {
-            position: fixed;
-            top: 30px;
-            right: 40px;
-            background: rgba(15, 5, 25, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 0, 127, 0.4);
-            border-radius: 50px;
-            padding: 12px 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            position: fixed; top: 30px; right: 40px;
+            background: rgba(15, 5, 25, 0.7); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 0, 127, 0.4); border-radius: 50px;
+            padding: 12px 25px; display: flex; align-items: center; gap: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 0, 127, 0.2);
-            z-index: 100;
-            font-size: 1.1rem;
-            color: #fff;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            cursor: default;
+            z-index: 100; font-size: 1.1rem; color: #fff; font-weight: 700;
+            transition: all 0.3s ease; cursor: default;
             opacity: 0; transform: translateY(-20px);
         }
         .live-dot {
             width: 12px; height: 12px; background-color: #00ff88; border-radius: 50%;
-            box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
-            animation: pulseDot 1.5s infinite alternate;
+            box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88; animation: pulseDot 1.5s infinite alternate;
         }
 
         /* --- LOGIN POPUP --- */
@@ -95,19 +74,16 @@
             z-index: 5000; display: flex; justify-content: center; align-items: center;
             transition: all 0.5s ease-in-out;
         }
-
         .login-box {
             background: rgba(20, 10, 30, 0.6); border: 2px solid #ff007f;
             padding: 40px; border-radius: 30px; text-align: center; width: 400px; max-width: 90%;
             box-shadow: 0 0 50px rgba(255, 0, 127, 0.4); transform: scale(0);
             animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-
         .skin-avatar {
             width: 100px; height: 100px; border-radius: 15px; border: 3px solid #fff;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); margin-bottom: 20px;
         }
-
         .login-input {
             width: 100%; padding: 15px; background: rgba(0,0,0,0.5);
             border: 1px solid #ff8e8b; border-radius: 10px; color: #fff;
@@ -168,18 +144,30 @@
             transform: translateY(-10px) scale(1.02); border-color: rgba(255, 0, 127, 0.6);
             box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 40px rgba(255, 0, 127, 0.3);
         }
-        .card h2 { font-size: 1.6rem; margin-bottom: 20px; color: #fff; border-bottom: 2px solid rgba(255, 0, 127, 0.3); padding-bottom: 10px; }
+        .card h2 { font-size: 1.6rem; margin-bottom: 10px; color: #fff; border-bottom: 2px solid rgba(255, 0, 127, 0.3); padding-bottom: 10px; }
 
-        /* --- 2. STORE RANKS STYLING --- */
-        .rank-list { list-style: none; text-align: left; margin-bottom: auto; }
+        /* --- STORE STYLING --- */
+        .rank-list { list-style: none; text-align: left; margin-bottom: auto; margin-top: 10px; }
         .rank-item {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .rank-info { display: flex; flex-direction: column; }
         .rank-name { font-weight: bold; font-size: 1.1rem; color: #ff8e8b; }
         .rank-perk { font-size: 0.8rem; color: #aaa; }
-        .rank-price { font-weight: bold; color: #00ff88; font-size: 1.1rem; }
+        .rank-price { font-weight: bold; color: #00ff88; font-size: 1rem; }
+        
+        /* Store Disclaimer */
+        .disclaimer {
+            margin-top: 15px;
+            font-size: 0.75rem;
+            color: #999;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 10px;
+            line-height: 1.4;
+        }
+        .secure-badge { color: #00ff88; font-weight: bold; }
+        .no-refund { color: #ff4d4d; font-weight: bold; text-transform: uppercase; }
 
         .btn {
             display: inline-block; width: 100%; padding: 12px 0; border-radius: 12px;
@@ -188,7 +176,14 @@
         }
         .btn-mc { background: linear-gradient(90deg, #ff007f, #ff6b6b); color: #fff; }
         .btn-discord { background: #5865F2; color: #fff; display: flex; justify-content: center; gap: 10px; }
-        .btn-store { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; }
+        
+        /* New Discord Store Button Style */
+        .btn-store { 
+            background: linear-gradient(90deg, #5865F2, #ff007f); 
+            color: #fff; 
+            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.3);
+        }
+
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
         .ip-display {
@@ -209,7 +204,7 @@
         @keyframes zoomOut { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
 
         /* Rules list */
-        .rules-list { text-align: left; list-style: none; }
+        .rules-list { text-align: left; list-style: none; margin-top: 10px;}
         .rules-list li { margin-bottom: 12px; padding-left: 25px; position: relative; font-size: 1rem; color: #d1b3ff; }
         .rules-list li::before { content: '•'; position: absolute; left: 0; color: #ff007f; font-size: 1.5rem; line-height: 1rem; }
 
@@ -281,6 +276,9 @@
 
             <div class="card">
                 <h2>Buy Ranks</h2>
+                <p style="font-size: 0.85rem; color: #ddd; margin-bottom: 10px;">
+                    Create a <b>Ticket</b> in Discord to purchase.
+                </p>
                 <ul class="rank-list">
                     <li class="rank-item">
                         <div class="rank-info">
@@ -311,7 +309,15 @@
                         <span class="rank-price">₹499/mo</span>
                     </li>
                 </ul>
-                <button class="btn btn-store">Visit Store</button>
+                
+                <a href="https://discord.gg/ZmCVr8c6sf" target="_blank" class="btn btn-store">
+                    Join Discord to Buy
+                </a>
+
+                <div class="disclaimer">
+                    <span class="no-refund">⚠ No Refunds</span> • <span class="secure-badge">100% Trusted</span><br>
+                    Payments are secure. All perks listed in Discord.
+                </div>
             </div>
 
             <div class="card">
@@ -332,9 +338,9 @@
         const loginOverlay = document.getElementById('login-overlay');
         const mainContent = document.getElementById('main-content');
         const counterPill = document.getElementById('counter-pill');
-        const userProfile = document.getElementById('user-profile'); // NEW
-        const profileHead = document.getElementById('profile-head'); // NEW
-        const profileName = document.getElementById('profile-name'); // NEW
+        const userProfile = document.getElementById('user-profile');
+        const profileHead = document.getElementById('profile-head');
+        const profileName = document.getElementById('profile-name');
         const mainTitle = document.getElementById('main-title');
 
         usernameInput.addEventListener('input', function() {
@@ -353,26 +359,19 @@
 
             if(bedrockToggle.checked && !name.startsWith('.')) name = "." + name;
 
-            // UPDATE TOP LEFT PROFILE
             profileName.innerText = name;
-            // For skin url, we remove the dot if it exists because Minotar handles java names better
             let skinName = name.startsWith('.') ? name.substring(1) : name;
             profileHead.src = `https://minotar.net/helm/${skinName}/100.png`;
 
-            // Animations
             document.querySelector('.login-box').style.animation = "zoomOut 0.5s forwards";
             loginOverlay.style.opacity = "0";
 
             setTimeout(() => {
                 loginOverlay.style.display = "none";
                 document.body.style.overflow = "auto";
-                
                 mainContent.classList.add('wrapper-visible');
-                
-                // Show Counter & User Profile
                 counterPill.style.opacity = "1"; counterPill.style.transform = "translateY(0)";
                 userProfile.style.opacity = "1"; userProfile.style.transform = "translateX(0)";
-
                 mainTitle.innerText = `Welcome, ${name}`;
                 if(name.length > 10) mainTitle.style.fontSize = "4rem";
             }, 500);
