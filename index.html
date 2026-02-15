@@ -51,7 +51,7 @@
         .user-name { font-weight: 700; font-size: 1.1rem; color: #fff; }
         .user-status { font-size: 0.75rem; color: #00ff88; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- LIVE PLAYER COUNTER --- */
+        /* --- LIVE PLAYER COUNTER (ALWAYS ONLINE MOD) --- */
         .player-counter {
             position: fixed; top: 30px; right: 40px;
             background: rgba(15, 5, 25, 0.7); backdrop-filter: blur(15px);
@@ -157,14 +157,9 @@
         .rank-perk { font-size: 0.8rem; color: #aaa; }
         .rank-price { font-weight: bold; color: #00ff88; font-size: 1rem; }
         
-        /* Store Disclaimer */
         .disclaimer {
-            margin-top: 15px;
-            font-size: 0.75rem;
-            color: #999;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 10px;
-            line-height: 1.4;
+            margin-top: 15px; font-size: 0.75rem; color: #999;
+            border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; line-height: 1.4;
         }
         .secure-badge { color: #00ff88; font-weight: bold; }
         .no-refund { color: #ff4d4d; font-weight: bold; text-transform: uppercase; }
@@ -176,14 +171,7 @@
         }
         .btn-mc { background: linear-gradient(90deg, #ff007f, #ff6b6b); color: #fff; }
         .btn-discord { background: #5865F2; color: #fff; display: flex; justify-content: center; gap: 10px; }
-        
-        /* New Discord Store Button Style */
-        .btn-store { 
-            background: linear-gradient(90deg, #5865F2, #ff007f); 
-            color: #fff; 
-            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.3);
-        }
-
+        .btn-store { background: linear-gradient(90deg, #5865F2, #ff007f); color: #fff; box-shadow: 0 5px 15px rgba(88, 101, 242, 0.3); }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
 
         .ip-display {
@@ -230,7 +218,7 @@
 
     <div class="player-counter" id="counter-pill">
         <div class="live-dot" id="status-dot"></div>
-        <div id="player-count">Pinging...</div>
+        <div id="player-count">Checking Status...</div>
     </div>
 
     <div id="login-overlay">
@@ -309,11 +297,9 @@
                         <span class="rank-price">₹499/mo</span>
                     </li>
                 </ul>
-                
                 <a href="https://discord.gg/ZmCVr8c6sf" target="_blank" class="btn btn-store">
                     Join Discord to Buy
                 </a>
-
                 <div class="disclaimer">
                     <span class="no-refund">⚠ No Refunds</span> • <span class="secure-badge">100% Trusted</span><br>
                     Payments are secure. All perks listed in Discord.
@@ -356,16 +342,12 @@
                 setTimeout(() => usernameInput.style.borderColor = "#ff8e8b", 500);
                 return;
             }
-
             if(bedrockToggle.checked && !name.startsWith('.')) name = "." + name;
-
             profileName.innerText = name;
             let skinName = name.startsWith('.') ? name.substring(1) : name;
             profileHead.src = `https://minotar.net/helm/${skinName}/100.png`;
-
             document.querySelector('.login-box').style.animation = "zoomOut 0.5s forwards";
             loginOverlay.style.opacity = "0";
-
             setTimeout(() => {
                 loginOverlay.style.display = "none";
                 document.body.style.overflow = "auto";
@@ -432,22 +414,23 @@
             setTimeout(() => document.querySelector(".btn-mc").innerText = "Copy IP Address", 2000);
         }
 
-        // --- Player Counter ---
-        const serverIP = "play.sugarpie.net"; 
-        async function updatePlayerCount() {
-            try {
-                const response = await fetch(`https://api.mcsrvstat.us/2/${serverIP}`);
-                const data = await response.json();
-                if (data.online) {
-                    document.getElementById("player-count").innerText = `${data.players.online} Players Online`;
-                    document.getElementById("status-dot").style.backgroundColor = "#00ff88";
-                } else {
-                    document.getElementById("player-count").innerText = "Server Offline";
-                    document.getElementById("status-dot").style.backgroundColor = "#ff0033";
-                }
-            } catch (e) { document.getElementById("player-count").innerText = "Stats Unavailable"; }
+        // --- FORCED ONLINE STATUS LOGIC (FAKE MODE FOR DISPLAY) ---
+        // This function simulates the server being online even if it is offline.
+        function forceOnlineStatus() {
+            // Generate random player count between 24 and 58 to look realistic
+            const fakePlayers = Math.floor(Math.random() * (58 - 24 + 1) + 24);
+            
+            document.getElementById("player-count").innerText = `${fakePlayers} Players Online`;
+            const dot = document.getElementById("status-dot");
+            dot.style.backgroundColor = "#00ff88"; // Neon Green
+            dot.style.boxShadow = "0 0 10px #00ff88, 0 0 20px #00ff88"; // Glowing Green
         }
-        updatePlayerCount(); setInterval(updatePlayerCount, 60000);
+
+        // Run immediately
+        forceOnlineStatus();
+        // Update every 5 seconds to fluctuate player count slightly
+        setInterval(forceOnlineStatus, 5000);
+
     </script>
 </body>
 </html>
